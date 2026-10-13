@@ -12,7 +12,7 @@ export const slides: Slide[] = [
   {
     id: 'title',
     title: 'SYSTEM DESIGN\n& ARCHITECTURE',
-    titleSize: 168,
+    titleSize: 156,
     subtitle: 'IN AUTONOMOUS SYSTEMS',
     theme: 'dark',
     layout: 'title',
