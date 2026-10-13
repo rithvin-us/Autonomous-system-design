@@ -219,14 +219,24 @@ function Rig({
  * canvas instead of the centre. Lets a full-bleed canvas frame an object in
  * the right-hand part of the slide without clipping it at a hard edge.
  */
-function ViewOffset({ cx }: { cx: number }) {
+function ViewOffset({ cx = 0.5, cy = 0.5 }: { cx?: number; cy?: number }) {
   const { camera, size } = useThree();
   useLayoutEffect(() => {
     const cam = camera as PerspectiveCamera;
-    if (cx === 0.5) cam.clearViewOffset();
-    else cam.setViewOffset(size.width, size.height, -(cx - 0.5) * size.width, 0, size.width, size.height);
+    if (cx === 0.5 && cy === 0.5) {
+      cam.clearViewOffset();
+    } else {
+      cam.setViewOffset(
+        size.width,
+        size.height,
+        -(cx - 0.5) * size.width,
+        (cy - 0.5) * size.height,
+        size.width,
+        size.height,
+      );
+    }
     cam.updateProjectionMatrix();
-  }, [camera, size.width, size.height, cx]);
+  }, [camera, size.width, size.height, cx, cy]);
   return null;
 }
 
@@ -281,6 +291,7 @@ export function ModelStage({
   snapshotId,
   snapshotDelay = 1.4,
   viewCenterX = 0.5,
+  viewCenterY = 0.5,
   style,
   className,
   children,
@@ -295,6 +306,8 @@ export function ModelStage({
   snapshotDelay?: number;
   /** Where the orbit target sits across the canvas (0 = left, 1 = right). */
   viewCenterX?: number;
+  /** Where the orbit target sits down the canvas (0 = top, 1 = bottom). */
+  viewCenterY?: number;
   style?: CSSProperties;
   className?: string;
   children: ReactNode;
@@ -309,7 +322,7 @@ export function ModelStage({
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         camera={{ position: camera.position, fov: camera.fov, near: 0.02, far: 400 }}
       >
-        <ViewOffset cx={viewCenterX} />
+        <ViewOffset cx={viewCenterX} cy={viewCenterY} />
         <StudioLighting tone={lighting} />
         <Rig camera={camera} autoRotate={autoRotate} autoRotateSpeed={autoRotateSpeed} enableZoom={enableZoom}>
           {children}

@@ -6,6 +6,7 @@ import type { Line2 } from 'three-stdlib';
 import { palette } from '../content/theme';
 import type { SensorConfig, SensorId, Vec3 } from '../content/types';
 import { HCSR04 } from '../models/HcSr04';
+import { jetsonActivity } from '../models/JetsonOrin';
 
 /**
  * Live values a demo publishes for the read-out panel drawn outside the 3D
@@ -605,6 +606,90 @@ function UltrasonicDemo({ on, cfg, hud, children }: DemoProps) {
   );
 }
 
+
+/* ------------------------------------------------------------------ */
+/* Jetson: sensor data in through the ports, commands out              */
+/* ------------------------------------------------------------------ */
+
+interface Flow {
+  label: string;
+  from: Vec3;
+  to: Vec3;
+  /** true = data leaving the computer */
+  out?: boolean;
+}
+
+function FlowLine({ flow, offset }: { flow: Flow; offset: number }) {
+  const dots = useRef<(Mesh | null)[]>([]);
+  const a = useMemo(() => new Vector3(...flow.from), [flow.from]);
+  const b = useMemo(() => new Vector3(...flow.to), [flow.to]);
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    dots.current.forEach((m, i) => {
+      if (!m) return;
+      const p = (((t * 0.6 + offset + i / 3) % 1) + 1) % 1;
+      // Inputs travel source → port; outputs travel port → destination.
+      if (flow.out) m.position.lerpVectors(b, a, p);
+      else m.position.lerpVectors(a, b, p);
+    });
+  });
+  return (
+    <group>
+      <Line points={[flow.from, flow.to]} color={flow.out ? ORANGE : STEEL} lineWidth={2} dashed dashSize={0.06} gapSize={0.05} />
+      {[0, 1, 2].map((i) => (
+        <mesh key={i} ref={(m) => { dots.current[i] = m; }}>
+          <boxGeometry args={[0.045, 0.045, 0.045]} />
+          <meshBasicMaterial color={ORANGE} />
+        </mesh>
+      ))}
+      <Tag position={[flow.from[0], flow.from[1] + 0.16, flow.from[2]]} boxed accent={flow.out}>
+        {flow.label}
+      </Tag>
+    </group>
+  );
+}
+
+function JetsonOverlay({ cfg }: { cfg: SensorConfig }) {
+  const s = cfg.displayScale;
+  const port = (x: number, y: number, z: number): Vec3 => [x * s, y * s, z * s];
+  const flows: Flow[] = useMemo(
+    () => [
+      { label: 'Stereo camera', from: [-0.35, 0.45, 2.0], to: port(-8, 9, 41) },
+      { label: 'GNSS + IMU', from: [0.55, 0.55, 1.9], to: port(9, 9, 41) },
+      { label: 'Radar (network)', from: [1.65, 0.35, 1.45], to: port(28, 7, 42) },
+      { label: 'Camera (CSI)', from: [-1.95, 0.35, 0.3], to: port(-47.5, 3, -3) },
+      { label: 'To microcontroller', from: [-0.1, 0.35, -1.85], to: port(-6, 8.5, -34.5), out: true },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [s],
+  );
+  useEffect(() => {
+    jetsonActivity.level = 1;
+    return () => {
+      jetsonActivity.level = 0;
+    };
+  }, []);
+  return (
+    <group>
+      {flows.map((f, i) => (
+        <FlowLine key={f.label} flow={f} offset={i * 0.2} />
+      ))}
+      <Tag position={[-0.1, 0.62, 0.05]} accent>
+        Processing
+      </Tag>
+    </group>
+  );
+}
+
+function JetsonDemo({ on, cfg, children }: DemoProps) {
+  return (
+    <>
+      {children}
+      {on && <JetsonOverlay cfg={cfg} />}
+    </>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Read-out panels (DOM, outside the canvas)                           */
 /* ------------------------------------------------------------------ */
@@ -675,6 +760,7 @@ export const demoViews: Record<SensorId, { position: Vec3; target: Vec3 }> = {
   gnss: { position: [2.5, 2.7, 6.6], target: [0.15, 1.25, 0] },
   imu: { position: [2.5, 2.3, 4.0], target: [0, 0.2, 0] },
   ultrasonic: { position: [-4.0, 4.6, -5.0], target: [0.1, -0.3, 2.2] },
+  jetson: { position: [3.1, 3.4, 3.9], target: [0, 0.15, 0.1] },
 };
 
 /** Per-sensor demonstration wrapped around the hardware model. */
@@ -684,4 +770,5 @@ export const sensorDemos: Record<SensorId, ComponentType<DemoProps>> = {
   gnss: GnssDemo,
   imu: ImuDemo,
   ultrasonic: UltrasonicDemo,
+  jetson: JetsonDemo,
 };

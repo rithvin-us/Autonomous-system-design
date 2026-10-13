@@ -3,8 +3,8 @@ import type { Slide } from '../content/types';
 import { SlideRenderer } from './SlideRenderer';
 import { STAGE_H, STAGE_W } from './contexts';
 
-const COLS = 5;
-const THUMB_W = 300;
+const COLS = 6;
+const THUMB_W = 250;
 const SCALE = THUMB_W / STAGE_W;
 const THUMB_H = STAGE_H * SCALE;
 

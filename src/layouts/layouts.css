@@ -17,7 +17,7 @@
 
 .slide .kicker {
   color: var(--c-orange);
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 }
 
 /* ---------- title ---------- */
@@ -26,21 +26,25 @@
 }
 .l-title .heading {
   left: 120px;
-  bottom: 118px;
-  width: 1400px;
+  bottom: 110px;
+  width: 1650px;
 }
 .l-title .title {
-  font-size: 148px;
-  line-height: 0.88;
+  font-size: 168px;
+  line-height: 0.86;
+  letter-spacing: -0.015em;
+  font-weight: 900;
+  text-shadow: 0 4px 32px rgba(0, 0, 0, 0.8);
 }
 .l-title .subtitle {
-  margin-top: 36px;
+  margin-top: 34px;
   font-family: var(--f-head);
-  font-weight: 700;
+  font-weight: 800;
   font-stretch: 112%;
-  font-size: 46px;
-  letter-spacing: 0.06em;
+  font-size: 52px;
+  letter-spacing: 0.08em;
   color: var(--c-orange);
+  text-shadow: 0 2px 24px rgba(255, 106, 19, 0.4);
 }
 
 /* ---------- top ---------- */
@@ -54,7 +58,7 @@
   align-items: end;
 }
 .l-top .title {
-  font-size: 84px;
+  font-size: 76px;
 }
 .l-top .desc {
   padding-bottom: 4px;

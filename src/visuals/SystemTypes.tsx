@@ -16,7 +16,7 @@ const CANVAS = { left: 0, right: 0, top: 0, bottom: 268 } as const;
 
 /** Model and its largest dimension (m), keyed by item id in slides.ts. */
 const MODELS: Record<string, { size: number; render: (live: boolean) => ReactNode }> = {
-  car: { size: 4.8, render: () => <RoboTaxi /> },
+  car: { size: 5.5, render: () => <RoboTaxi /> },
   amr: { size: 2.1, render: () => <WarehouseAmrs /> },
   drone: { size: 1.95, render: (live) => <DroneDock animate={live} /> },
   robot: { size: 2.25, render: () => <Humanoid /> },

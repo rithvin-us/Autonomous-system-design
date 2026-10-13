@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import type { SensorId } from '../content/types';
 import { GnssModel } from './GnssAntenna';
+import { JETSON, JETSON_FLOOR_Y, JetsonOrinModel } from './JetsonOrin';
 import { HCSR04_FLOOR_Y, HcSr04Model } from './HcSr04';
 import { IMU_FLOOR_Y, ImuBoardModel } from './ImuBoard';
 import { RADAR_PLACEHOLDER, RadarPlaceholderModel } from './RadarPlaceholder';
@@ -16,4 +17,5 @@ export const sensorModels: Record<SensorId, { Model: ComponentType; floorY: numb
   gnss: { Model: GnssModel, floorY: 0, size: 150 },
   imu: { Model: ImuBoardModel, floorY: IMU_FLOOR_Y, size: 26 },
   ultrasonic: { Model: HcSr04Model, floorY: HCSR04_FLOOR_Y, size: 45 },
+  jetson: { Model: JetsonOrinModel, floorY: JETSON_FLOOR_Y, size: JETSON.width },
 };

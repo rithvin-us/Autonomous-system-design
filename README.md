@@ -1,6 +1,6 @@
 # System Design & Architecture in Autonomous Systems
 
-A 25-slide lecture deck for first-year engineering students, built as a
+A 26-slide lecture deck for first-year engineering students, built as a
 browser presentation: one 16:9 slide at a time, interactive 3D sensor
 hardware, animated diagrams, and clicker-driven builds. It runs fully
 offline.
@@ -42,6 +42,15 @@ how many builds the current slide has.
 Add `?solo` to the URL to open a copy that does not follow or drive other
 open windows (useful for rehearsing while the main deck is open).
 
+## Speaking script
+
+`script.md` is a full speaking script for all 26 slides (about 58 minutes),
+built around one thread: an autonomous machine is a *designed system*. Each
+slide has a **design lens** (requirements, architecture, interfaces,
+trade-offs, failure handling, verification) and a **[click]** cue for every
+build. The presenter notes (N, or the P window) carry each slide's design
+lens in short.
+
 ## Changing the content
 
 All text and slide order live in `src/content/`; components only decide how
@@ -70,7 +79,7 @@ things look.
 
 ## Replacing the sensor and vehicle models
 
-Each sensor has a built-in procedural model. To use real CAD instead:
+Each sensor, and the Jetson computer on slide 14, has a built-in procedural model (all defined in `sensors.ts`). To use real CAD instead:
 
 1. Export the part as **GLB** (glTF binary), in **millimetres**, front facing
    **+Z**, Y up, origin at the centre of the part.
@@ -96,6 +105,7 @@ The team vehicle works the same way: `deck.ts` → `vehicle.glb`
 | GNSS | Illustrative generic antenna + receiver |
 | IMU | Illustrative generic breakout board |
 | HC-SR04 | Illustrative, typical vendor dimensions |
+| Jetson Orin (computing) | Illustrative, after the Jetson Orin Nano Developer Kit layout |
 | Vehicle | Illustrative buggy — team vehicle pending |
 
 ## Slide 04: types of autonomous system

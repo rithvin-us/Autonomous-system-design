@@ -64,8 +64,19 @@ deck's rules: clicker-driven (no mouse), orange/steel palette, projector-legible
 ## Round 3 (requested 14:20)
 
 - [x] T27 Remove the "Film character" marking on slide 04
-- [ ] T28 More detailed, realistic slide 04 models (robotaxi, AMRs, drone + dock, humanoid)
-- [ ] T29 System-design emphasis: per-slide design-lens kickers, notes reframed around design decisions
-- [ ] T30 script.md: speaking script for all 25 slides, system-design centred
+- [x] T28 More detailed, realistic slide 04 models (robotaxi, AMRs, drone + dock, humanoid)
+- [x] T29 System-design emphasis: per-slide design-lens kickers, notes reframed around design decisions
+- [x] T30 script.md: speaking script for all 25 slides, system-design centred
 - [ ] T31 Verify every slide and step in the presentation
+- [x] T33 Jetson Orin onboard-computer showcase slide (14) with part tour and data-flow demo; script and notes updated
 - [ ] T32 Deploy to Vercel and share the link
+
+## Round 4 — architecture-first (requested 14:45)
+
+- [ ] T34 New slide: system design process (V-model)
+- [ ] T35 New slide: architecture choice — modular vs end-to-end
+- [ ] T36 New slide: functional → physical allocation
+- [ ] T37 New slide: our vehicle's full system architecture (interfaces, traced data paths)
+- [ ] T38 New slide: safety architecture (doer/checker, watchdog, hardware stop, fail-safe vs fail-operational)
+- [ ] T39 Script, notes, README for the new slides; verify all slides
+- [ ] T32 Deploy to Vercel (waiting for `vercel login`)

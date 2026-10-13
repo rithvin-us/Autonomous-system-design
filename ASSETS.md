@@ -13,6 +13,7 @@ manufacturer CAD file. Their status is shown on the slides unless
 | GNSS antenna + receiver | `src/models/GnssAntenna.tsx` | Illustrative generic | None (generic form). |
 | IMU module | `src/models/ImuBoard.tsx` | Illustrative generic | None (generic form). |
 | HC-SR04 | `src/models/HcSr04.tsx` | Illustrative | Typical vendor listings: 45 × 20 × 15 mm, ~16 mm transducers marked T/R, 4-pin header Vcc/Trig/Echo/Gnd. |
+| NVIDIA Jetson Orin (dev kit) | `src/models/JetsonOrin.tsx` | Illustrative reconstruction | NVIDIA Jetson Orin Nano Developer Kit user guide, Hardware Layout (connector set); retailer listing for the 100 × 79 mm footprint. Connector positions approximate; no logos reproduced. |
 | Autonomous buggy | `src/models/Vehicle.tsx` | Illustrative | None; stands in for the team vehicle. |
 | Scenario rover | `src/models/MiniRover.tsx` | Generic | None. |
 | Slide 04 robotaxi, warehouse AMRs, drone + dock, humanoid | `src/models/TypesModels.tsx` | Illustrative study models | The presenter's four reference photos (below). Shapes only; no logos, brand marks or likenesses reproduced. |

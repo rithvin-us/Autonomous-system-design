@@ -16,7 +16,8 @@ export type Theme = 'dark' | 'light';
  */
 export type Layout = 'title' | 'top' | 'left' | 'overlay' | 'showcase' | 'statement';
 
-export type SensorId = 'zed2i' | 'radar' | 'gnss' | 'imu' | 'ultrasonic';
+/** Hardware with a showcase slide: the five sensors and the onboard computer. */
+export type SensorId = 'zed2i' | 'radar' | 'gnss' | 'imu' | 'ultrasonic' | 'jetson';
 
 export type Vec3 = [number, number, number];
 

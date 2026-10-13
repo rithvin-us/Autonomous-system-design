@@ -20,12 +20,13 @@ export default function TitleScene(_props: VisualProps<'titleScene'>) {
         <SnapshotImage id={slide.id} style={{ inset: 0 }} />
       ) : (
         <ModelStage
-          camera={{ position: [4.7, 1.55, 4.6], target: [0, 0.32, 0], fov: 30, minDistance: 3, maxDistance: 10 }}
-          autoRotateSpeed={0.3}
+          camera={{ position: [4.8, 1.8, 4.6], target: [0, 0.2, 0], fov: 32, minDistance: 3, maxDistance: 12 }}
+          autoRotateSpeed={0.25}
           lighting="dark"
-          shadow={{ y: 0.001, opacity: 0.7, scale: 6, blur: 2.2, far: 1.6 }}
+          shadow={{ y: 0.001, opacity: 0.6, scale: 3.8, blur: 2.0, far: 1.6 }}
           snapshotId={slide.id}
-          viewCenterX={0.7}
+          viewCenterX={0.72}
+          viewCenterY={0.34}
           style={{ inset: 0 }}
         >
           {/* Warm rim light from behind */}
@@ -43,7 +44,9 @@ export default function TitleScene(_props: VisualProps<'titleScene'>) {
             fadeStrength={2}
             infiniteGrid
           />
-          <ModelSource glb={deck.vehicle.glb} transform={deck.vehicle.glbTransform} fallback={<VehicleModel />} />
+          <group scale={0.55}>
+            <ModelSource glb={deck.vehicle.glb} transform={deck.vehicle.glbTransform} fallback={<VehicleModel />} />
+          </group>
         </ModelStage>
       )}
       <AssetTag status={deck.vehicle.status} note={deck.vehicle.statusNote} style={{ right: 120, top: 72 }} />
