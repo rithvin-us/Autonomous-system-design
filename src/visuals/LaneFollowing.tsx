@@ -31,15 +31,23 @@ export default function LaneFollowing({ visual }: VisualProps<'laneFollowing'>) 
 
   // Simple follower: the robot steers towards a point on the lane centre ahead.
   const s = sim.current;
-  const dt = Math.min(0.05, Math.max(0, t - s.t));
+  let remaining = Math.min(0.5, Math.max(0, t - s.t));
+  const fresh = s.t === 0 && s.trail.length === 0;
   s.t = t;
   const scroll = t * SCROLL;
   const xw = ROBOT_X + scroll;
+  if (fresh) s.y = centre(xw) + 18;
+  let steer = 0;
+  let simX = xw - remaining * SCROLL;
+  while (remaining > 1e-6) {
+    const h = Math.min(0.02, remaining);
+    simX += SCROLL * h;
+    steer = Math.max(-0.5, Math.min(0.5, Math.atan2(centre(simX + LOOKAHEAD) - s.y, LOOKAHEAD) - s.heading));
+    s.heading += steer * 1.1 * h;
+    s.y += Math.sin(s.heading) * SCROLL * h;
+    remaining -= h;
+  }
   const aheadY = centre(xw + LOOKAHEAD);
-  const steer = Math.max(-0.5, Math.min(0.5, Math.atan2(aheadY - s.y, LOOKAHEAD) - s.heading));
-  s.heading += steer * 2.2 * dt;
-  s.y += Math.sin(s.heading) * SCROLL * dt;
-  if (dt === 0 && s.trail.length === 0) s.y = centre(xw) + 18;
   s.trail.push([xw, s.y]);
   if (s.trail.length > 240) s.trail.shift();
 
@@ -74,7 +82,7 @@ export default function LaneFollowing({ visual }: VisualProps<'laneFollowing'>) 
 
   return (
     <>
-      <svg className="dg" viewBox={`0 0 ${W} ${H}`} style={{ height: H, bottom: 'auto' }} aria-hidden>
+      <svg className="dg" viewBox={`0 0 ${W} ${H}`} style={{ height: H, bottom: 'auto', overflow: 'hidden' }} aria-hidden>
         <DiagramDefs id="-lf" />
         {/* Road */}
         <path d={line(0)} fill="none" stroke="var(--bg-3)" strokeWidth={LANE_HALF * 2 + 24} />
@@ -115,7 +123,7 @@ export default function LaneFollowing({ visual }: VisualProps<'laneFollowing'>) 
           <g>
             <line x1={ROBOT_X - 70} x2={ROBOT_X + 70} y1={centre(xw)} y2={centre(xw)} stroke="var(--c-orange)" strokeWidth={3} strokeDasharray="8 6" />
             <line x1={ROBOT_X - 60} x2={ROBOT_X - 60} y1={s.y} y2={centre(xw)} stroke="var(--c-orange)" strokeWidth={4} markerEnd="url(#arrow-accent-lf)" markerStart="url(#arrow-accent-lf)" />
-            <text x={ROBOT_X - 80} y={(s.y + centre(xw)) / 2 + 8} textAnchor="end" className="dg-label is-accent">
+            <text x={ROBOT_X - 80} y={Math.min(s.y, centre(xw)) - 34} textAnchor="end" className="dg-label is-accent">
               Offset from centre
             </text>
           </g>

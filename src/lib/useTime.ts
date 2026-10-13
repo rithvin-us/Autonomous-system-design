@@ -43,3 +43,10 @@ export const smooth = (t: number) => {
 };
 /** 0→1 progress of t within [a, b]. */
 export const span = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
+
+/** Seconds since `key` last changed (e.g. the clicker step), given the current time. */
+export function useSince(key: unknown, t: number): number {
+  const ref = useRef({ key, t0: t });
+  if (ref.current.key !== key) ref.current = { key, t0: t };
+  return Math.max(0, t - ref.current.t0);
+}

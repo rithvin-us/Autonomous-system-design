@@ -144,7 +144,7 @@ export default function Simulation({ visual }: VisualProps<'simulation'>) {
       <text x={VIEW.x + 20} y={VIEW.y - 18} className="dg-label is-muted" style={{ fontSize: 19 }}>
         {visual.simLabel}
       </text>
-      <text x={VIEW.x + VIEW.w} y={VIEW.y - 18} textAnchor="end" className="dg-label is-muted" style={{ fontSize: 19 }}>
+      <text x={VIEW.x + VIEW.w} y={VIEW.y - 18} textAnchor="end" className="dg-label is-muted" style={{ fontSize: 19, textTransform: 'none' }}>
         t = {(Math.min(local, RUN)).toFixed(1)} s
       </text>
       {!sample.sensor && (

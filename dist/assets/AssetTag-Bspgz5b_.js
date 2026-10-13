@@ -1,1 +1,0 @@
-import{d as e,f as t}from"./index-D3HS9oRd.js";var n=e();function r({status:e,note:r,style:i}){return!t.showAssetTags||e===`verified`?null:(0,n.jsx)(`div`,{className:`asset-tag`,"data-status":e,style:i,children:r})}export{r as t};

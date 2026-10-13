@@ -62,13 +62,12 @@ export type Visual =
   | {
       kind: 'systemTypes';
       items: (Labelled & {
+        /** Picks the 3D model: 'car' | 'amr' | 'drone' | 'robot'. */
         id: string;
-        /** Photo in /public (e.g. 'images/types/drone.jpg'). */
+        /** Reference photo in /public (e.g. 'images/types/drone.png'). */
         image: string;
-        /** CSS object-position for the crop, e.g. '30% 50%'. */
+        /** CSS object-position for the photo crop, e.g. '30% 50%'. */
         focus?: string;
-        /** Relative width of this photo in the row. */
-        width: number;
         /** Photo credit, shown small under the label (optional). */
         credit?: string;
       })[];
@@ -83,11 +82,9 @@ export type Visual =
       conditions: { id: string; label: string }[];
       sensors: {
         id: SensorId;
-        measures: string;
-        strength: string;
-        limit: string;
-        /** Condition ids in which this sensor is weakened or unavailable. */
+        /** Condition ids in which this sensor is weakened. */
         degradedIn: string[];
+        /** Condition ids in which this sensor stops working. */
         lostIn: string[];
       }[];
     }

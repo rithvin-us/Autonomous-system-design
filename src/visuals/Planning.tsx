@@ -1,177 +1,119 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import '../diagram/diagram.css';
+import { DiagramDefs, GoalMark, RobotTop, StartMark } from '../diagram/glyphs';
+import { at, cubic, route, toD, upTo, type Pt } from '../diagram/path';
+import { useSince, useTime } from '../lib/useTime';
+import { useSlide } from '../shell/contexts';
 import type { VisualProps } from './registry';
 
+const W = 1680;
+const H = 648;
+const START: Pt = [150, 330];
+const GOAL: Pt = [1530, 330];
+
+/** Obstacle outline (an irregular block in the middle of the floor). */
+const OBSTACLE: Pt[] = [
+  [700, 190],
+  [930, 170],
+  [1000, 260],
+  [980, 430],
+  [860, 480],
+  [690, 440],
+  [650, 300],
+];
+
+/** Candidate routes the planner considers. */
+const OPTIONS: { pts: Pt[]; blocked?: boolean; chosen?: boolean }[] = [
+  {
+    // Over the top: safe but long
+    pts: [START, ...cubic(START, [420, 330], [520, 70], [820, 70], 20).slice(1), ...cubic([820, 70], [1120, 70], [1260, 330], GOAL, 20).slice(1)],
+  },
+  {
+    // Straight through: blocked by the obstacle
+    pts: [START, [646, 330]],
+    blocked: true,
+  },
+  {
+    // Below: short and clear of the obstacle
+    pts: [START, ...cubic(START, [420, 330], [560, 570], [840, 570], 20).slice(1), ...cubic([840, 570], [1120, 570], [1260, 330], GOAL, 20).slice(1)],
+    chosen: true,
+  },
+];
+
+/**
+ * Slide 15. Step 0: start, goal and obstacle. Step 1: the routes the planner
+ * considers appear. Step 2: one is chosen. Step 3: the robot drives it.
+ */
 export default function Planning({ visual }: VisualProps<'planning'>) {
-  const [activePath, setActivePath] = useState<'chosen' | 'collision' | 'wide'>('chosen');
-  const [progress, setProgress] = useState(0);
+  const { step } = useSlide();
+  const t = useTime(1.6);
+  const chosen = OPTIONS.find((o) => o.chosen)!;
+  const r = useMemo(() => route(chosen.pts), [chosen]);
 
-  // Animate robot traversing chosen path
-  useEffect(() => {
-    let animId: number;
-    const animate = () => {
-      setProgress((p) => (p + 0.005) % 1);
-      animId = requestAnimationFrame(animate);
-    };
-    animId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animId);
-  }, []);
+  const showOptions = step >= 1;
+  const pick = step >= 2;
+  const drive = step >= 3;
 
-  // Parametric spline for chosen path
-  const px = 100 + progress * 800;
-  let py = 200;
-  if (px > 280 && px < 720) {
-    py = 200 - Math.sin(((px - 280) / 440) * Math.PI) * 90;
-  }
+  // Options draw in over a second when they appear; the drive loops every 6 s.
+  const since = useSince(step, t);
+  const reveal = !showOptions ? 0 : step === 1 ? Math.min(1, since / 1.2) : 1;
+  const run = drive ? ((since % 6) / 5) * r.total : 0;
+  const pose = drive ? at(r, Math.min(r.total, run)) : { x: START[0], y: START[1], angle: 0 };
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '10px 0 20px',
-      }}
-    >
-      {/* Trajectory Evaluation Arena */}
-      <div
-        style={{
-          flex: 1,
-          borderRadius: 12,
-          background: 'var(--bg-2)',
-          border: '1px solid var(--line)',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <svg viewBox="0 0 1000 400" style={{ width: '100%', height: '100%' }}>
-          {/* Background grid */}
-          {Array.from({ length: 20 }).map((_, i) => (
-            <line key={`pg-${i}`} x1={i * 50} y1={0} x2={i * 50} y2={400} stroke="var(--line)" strokeWidth={1} opacity={0.25} />
-          ))}
+    <svg className="dg" viewBox={`0 0 ${W} ${H}`} aria-hidden>
+      <DiagramDefs id="-pl" />
 
-          {/* Obstacle 1 with Safety Buffer Zone */}
-          <g transform="translate(500, 200)">
-            {/* Safety buffer */}
-            <circle r={60} fill="rgba(226, 59, 46, 0.12)" stroke="#e23b2e" strokeWidth={1.5} strokeDasharray="4,4" />
-            {/* Solid obstacle */}
-            <circle r={32} fill="#e23b2e" />
-            <text x={0} y={-42} textAnchor="middle" fontSize={12} fontFamily="var(--f-head)" fontWeight={700} fill="#e23b2e">
-              {visual.labels.obstacle.toUpperCase()}
-            </text>
-          </g>
+      {/* Floor grid */}
+      <g opacity={0.6}>
+        {Array.from({ length: 29 }, (_, i) => (
+          <line key={`v${i}`} x1={i * 60} x2={i * 60} y1={10} y2={640} stroke="var(--line)" strokeWidth={1} />
+        ))}
+        {Array.from({ length: 11 }, (_, i) => (
+          <line key={`h${i}`} x1={0} x2={W} y1={10 + i * 63} y2={10 + i * 63} stroke="var(--line)" strokeWidth={1} />
+        ))}
+      </g>
 
-          {/* Candidate Path 1: Direct path (Collides) */}
-          <line
-            x1={100}
-            y1={200}
-            x2={900}
-            y2={200}
-            stroke="#e23b2e"
-            strokeWidth={activePath === 'collision' ? 3 : 1.5}
-            strokeDasharray="6,6"
-            opacity={activePath === 'collision' ? 1 : 0.4}
-          />
+      <path d={toD(OBSTACLE) + ' Z'} fill="url(#hatch-pl)" stroke="var(--fg)" strokeWidth={3} />
+      <text x={825} y={334} textAnchor="middle" className="dg-label" style={{ fontSize: 22 }}>
+        {visual.labels.obstacle}
+      </text>
 
-          {/* Candidate Path 3: Wide detour (Suboptimal) */}
-          <path
-            d="M 100 200 C 350 340, 650 340, 900 200"
-            fill="none"
-            stroke="#8a9199"
-            strokeWidth={activePath === 'wide' ? 3 : 1.5}
-            strokeDasharray="6,6"
-            opacity={activePath === 'wide' ? 1 : 0.45}
-          />
-
-          {/* Candidate Path 2: Optimal avoidance spline (Chosen) */}
-          <path
-            d="M 100 200 C 320 200, 360 110, 500 110 C 640 110, 680 200, 900 200"
-            fill="none"
-            stroke="var(--c-orange)"
-            strokeWidth={activePath === 'chosen' ? 4 : 2}
-          />
-
-          {/* Start Point */}
-          <g transform="translate(100, 200)">
-            <circle r={14} fill="rgba(16, 185, 129, 0.2)" />
-            <circle r={7} fill="#10b981" />
-            <text x={0} y={-22} textAnchor="middle" fontSize={12} fontFamily="var(--f-head)" fontWeight={700} fill="#10b981">
-              {visual.labels.start.toUpperCase()}
-            </text>
-          </g>
-
-          {/* Goal Point */}
-          <g transform="translate(900, 200)">
-            <circle r={14} fill="rgba(59, 130, 246, 0.2)" />
-            <circle r={7} fill="#3b82f6" />
-            <text x={0} y={-22} textAnchor="middle" fontSize={12} fontFamily="var(--f-head)" fontWeight={700} fill="#3b82f6">
-              {visual.labels.goal.toUpperCase()}
-            </text>
-          </g>
-
-          {/* Simulated Driving Vehicle along chosen path */}
-          <g transform={`translate(${px}, ${py})`}>
-            <circle r={10} fill="var(--fg)" />
-            <circle r={5} fill="var(--c-orange)" />
-          </g>
-        </svg>
-      </div>
-
-      {/* Trajectory Cost Comparison Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 16 }}>
-        {[
-          {
-            id: 'collision' as const,
-            label: 'Route A · Direct Vector',
-            status: 'REJECTED',
-            color: '#e23b2e',
-            detail: 'Intersects obstacle collision envelope (High Risk)',
-          },
-          {
-            id: 'chosen' as const,
-            label: 'Route B · Clearance Spline',
-            status: 'CHOSEN (OPTIMAL)',
-            color: 'var(--c-orange)',
-            detail: 'Clears safety buffer with minimal lateral jerk and path length',
-          },
-          {
-            id: 'wide' as const,
-            label: 'Route C · Wide Detour',
-            status: 'SUBOPTIMAL',
-            color: '#8a9199',
-            detail: 'Safe clearance but 42% longer distance and execution time',
-          },
-        ].map((item) => {
-          const isSelected = activePath === item.id;
+      {/* Candidate routes */}
+      {showOptions &&
+        OPTIONS.map((o, i) => {
+          const rr = route(o.pts);
+          const pts = upTo(rr, rr.total * reveal);
+          const isChosen = pick && o.chosen;
           return (
-            <div
-              key={item.id}
-              onClick={() => setActivePath(item.id)}
-              style={{
-                borderRadius: 8,
-                background: isSelected ? 'var(--bg-3)' : 'var(--bg-2)',
-                border: isSelected ? `2px solid ${item.color}` : '1px solid var(--line)',
-                padding: '14px 18px',
-                cursor: 'pointer',
-                transition: 'all 160ms ease',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: 'var(--f-head)', fontSize: 16, fontWeight: 700, color: 'var(--fg)' }}>
-                  {item.label}
-                </span>
-                <span style={{ fontSize: 11, fontFamily: 'var(--f-head)', fontWeight: 800, color: item.color }}>
-                  {item.status}
-                </span>
-              </div>
-              <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
-                {item.detail}
-              </div>
-            </div>
+            <g key={i} opacity={pick && !o.chosen ? 0.35 : 1} className="dg-fade">
+              <path
+                d={toD(pts)}
+                fill="none"
+                stroke={isChosen ? 'var(--c-orange)' : 'var(--muted)'}
+                strokeWidth={isChosen ? 6 : 3}
+                strokeDasharray={isChosen ? undefined : '12 10'}
+              />
+              {o.blocked && reveal > 0.95 && <path d="M612 296 l40 40 M652 296 l-40 40" stroke="var(--c-fault)" strokeWidth={6} />}
+            </g>
           );
         })}
-      </div>
-    </div>
+      {drive && <path d={toD(upTo(r, run))} fill="none" stroke="var(--c-orange)" strokeWidth={10} opacity={0.35} />}
+
+      {showOptions && !pick && (
+        <text x={820} y={44} textAnchor="middle" className="dg-label is-muted" style={{ fontSize: 22 }}>
+          {visual.labels.options}
+        </text>
+      )}
+      {pick && (
+        <text x={840} y={618} textAnchor="middle" className="dg-label is-accent" style={{ fontSize: 22 }}>
+          {visual.labels.chosen}
+        </text>
+      )}
+
+      <StartMark x={START[0]} y={START[1]} label={visual.labels.start} />
+      <GoalMark x={GOAL[0]} y={GOAL[1]} label={visual.labels.goal} />
+      <RobotTop x={pose.x} y={pose.y} angle={pose.angle} size={70} />
+    </svg>
   );
 }

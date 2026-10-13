@@ -31,6 +31,20 @@ export function stepLabels(slide: Slide): string[] {
       return [...v.states.slice(1).map((s) => s.label), v.hardwareStop.label];
     case 'simulation':
       return v.scenarios.slice(1);
+    case 'sensorChoice':
+      return v.conditions.slice(1).map((c) => c.label);
+    case 'localisation':
+      return ['Localisation', 'Mapping'];
+    case 'planning':
+      return [v.labels.options, v.labels.chosen, 'Drive'];
+    case 'control':
+      return [v.labels.off, v.labels.on];
+    case 'hardwareChain':
+      return [...v.links, 'Emergency stop'];
+    case 'autonomyLoop':
+      return v.stages.map((s) => s.label);
+    case 'vehicleOverview':
+      return v.groups.map((g) => g.label);
     case 'systemTypes':
       return v.items.map((i) => i.label);
     case 'sensorLineup':

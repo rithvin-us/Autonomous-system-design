@@ -23,13 +23,17 @@ export default function Safety({ visual }: VisualProps<'safety'>) {
   const sim = useRef({ t: 0, x: 260, v: 150 });
 
   const s = sim.current;
-  const dt = Math.min(0.05, Math.max(0, t - s.t));
+  let remaining = Math.min(0.5, Math.max(0, t - s.t));
   s.t = t;
   const targetV = step === 0 ? 150 : step === 1 ? 110 : 0;
-  s.v += (targetV - s.v) * Math.min(1, dt * (step >= 2 ? 1.4 : 2));
-  if (s.v < 1 && step >= 2) s.v = 0;
-  s.x += s.v * dt;
-  if (s.x > W + 60) s.x = -60;
+  while (remaining > 1e-6) {
+    const h = Math.min(0.02, remaining);
+    s.v += (targetV - s.v) * Math.min(1, h * (step >= 2 ? 1.4 : 2));
+    if (s.v < 1 && step >= 2) s.v = 0;
+    s.x += s.v * h;
+    if (s.x > W + 60) s.x = -60;
+    remaining -= h;
+  }
 
   const state = Math.min(step, 2); // 0 normal, 1 fault, 2 safe
   const cameraLost = step >= 1;

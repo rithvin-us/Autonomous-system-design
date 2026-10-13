@@ -12,6 +12,7 @@ export const slides: Slide[] = [
   {
     id: 'title',
     title: 'SYSTEM DESIGN\n& ARCHITECTURE',
+    titleSize: 118,
     subtitle: 'IN AUTONOMOUS SYSTEMS',
     theme: 'dark',
     layout: 'title',
@@ -34,7 +35,7 @@ export const slides: Slide[] = [
       ],
     },
     notes:
-      '[EDIT] Presenter notes.\n\nInteraction: click Sensors / Computing / Actuators to highlight those parts on the vehicle. Drag to rotate.',
+      '[EDIT] Presenter notes.\n\nClicker: outlines the sensors, then the computing, then the actuators, naming each part.',
   },
   {
     id: 'automation-vs-autonomy',
@@ -48,7 +49,7 @@ export const slides: Slide[] = [
       autonomy: { label: 'Autonomy', detail: 'Senses, then decides' },
     },
     notes:
-      '[EDIT] Presenter notes.\n\nLeft: the pusher fires on a fixed timer whether or not a box is there. Right: the obstacle moves each run and the robot finds a new way round.',
+      '[EDIT] Presenter notes.\n\nStep 0: both run normally. Click: an unexpected object appears on both sides. The press keeps its timer and jams; the robot sees the obstacle and goes round it, choosing a different way each run as the obstacle moves.',
   },
   {
     id: 'types',
@@ -60,21 +61,20 @@ export const slides: Slide[] = [
     visual: {
       kind: 'systemTypes',
       items: [
-        { id: 'car', label: 'Autonomous vehicles', image: 'images/types/autonomous-vehicle.jpg', focus: '32% 55%', width: 460 },
-        { id: 'amr', label: 'Mobile robots', image: 'images/types/mobile-robot.jpg', focus: '24% 62%', width: 440 },
-        { id: 'drone', label: 'Drones', image: 'images/types/drone.jpg', focus: '50% 30%', width: 420 },
+        { id: 'car', label: 'Autonomous vehicles', image: 'images/types/autonomous-vehicle.png', focus: '32% 55%' },
+        { id: 'amr', label: 'Mobile robots', image: 'images/types/mobile-robot.png', focus: '30% 66%' },
+        { id: 'drone', label: 'Drones', image: 'images/types/drone.png', focus: '50% 22%' },
         {
           id: 'robot',
           label: 'Robotic machines',
           detail: 'Film character',
-          image: 'images/types/robotic-machine.jpg',
+          image: 'images/types/robotic-machine.png',
           focus: '50% 30%',
-          width: 312,
         },
       ],
       shared: 'Sense · Decide · Act',
     },
-    notes: '[EDIT] Presenter notes.\n\nClicker steps spotlight each photo in turn. Photos are third-party; check rights before sharing the deck publicly (see ASSETS.md).',
+    notes: '[EDIT] Presenter notes.\n\n3D study models built from the reference photos (shown beneath each). Clicker steps spotlight each type in turn. Photos are third-party; check rights before sharing the deck publicly (see ASSETS.md).',
   },
   {
     id: 'autonomy-loop',
@@ -92,17 +92,18 @@ export const slides: Slide[] = [
       ],
       centre: 'Repeat',
     },
-    notes: '[EDIT] Presenter notes.\n\nThe orange pulse travels the loop continuously; each stage lights as it passes.',
+    notes: '[EDIT] Presenter notes.\n\nStep 0: a pulse circles the loop. Each click stops on one stage.',
   },
   {
     id: 'architecture',
     title: 'AUTONOMOUS SYSTEM\nARCHITECTURE',
+    titleSize: 78,
     description: 'Sensors, computing, planning, control, and hardware work together as one system.',
     theme: 'light',
     layout: 'top',
     visual: { kind: 'flowDiagram', diagram: 'architecture' },
     notes:
-      '[EDIT] Presenter notes.\n\nData flows left to right; the dashed line along the bottom is the physical world feeding back into the sensors.',
+      '[EDIT] Presenter notes.\n\nStep 0: data moves through every stage. Each click holds on one column. The dashed line along the bottom is the physical world feeding back into the sensors.',
   },
   {
     id: 'sensors-and-data',
@@ -113,7 +114,7 @@ export const slides: Slide[] = [
     layout: 'overlay',
     visual: { kind: 'sensorLineup', sensors: ['zed2i', 'radar', 'gnss', 'imu', 'ultrasonic'] },
     notes:
-      '[EDIT] Presenter notes.\n\nClick any sensor to jump to its slide. Models are scaled for visibility, not to true relative size.',
+      '[EDIT] Presenter notes.\n\nEach click spotlights one sensor with what it measures. Models are scaled for visibility, not to true relative size.',
   },
   {
     id: 'zed2i',
@@ -125,7 +126,7 @@ export const slides: Slide[] = [
     layout: 'showcase',
     visual: { kind: 'sensorShowcase', sensor: 'zed2i' },
     notes:
-      '[EDIT] Presenter notes.\n\nParts: shows labelled hotspots. Depth: two lenses view the same point from 120 mm apart; nearer objects make a wider angle between the two sight lines.',
+      '[EDIT] Presenter notes.\n\nClicks visit each part, then the depth demo: two lenses 120 mm apart view the same point; nearer objects make a wider angle between the two sight lines.',
   },
   {
     id: 'radar',
@@ -192,52 +193,38 @@ export const slides: Slide[] = [
       sensors: [
         {
           id: 'zed2i',
-          measures: 'Images + depth',
-          strength: 'Rich visual detail',
-          limit: 'Needs light and clear air',
           degradedIn: ['fog'],
           lostIn: ['night'],
         },
         {
           id: 'radar',
-          measures: 'Distance + relative speed',
-          strength: 'Works in dark, rain and fog',
-          limit: 'Little shape detail',
           degradedIn: [],
           lostIn: [],
         },
         {
           id: 'gnss',
-          measures: 'Position on Earth',
-          strength: 'Absolute location',
-          limit: 'Needs a view of the sky',
           degradedIn: [],
           lostIn: ['covered'],
         },
         {
           id: 'imu',
-          measures: 'Own acceleration + rotation',
-          strength: 'Works anywhere',
-          limit: 'Errors build up over time',
           degradedIn: [],
           lostIn: [],
         },
         {
           id: 'ultrasonic',
-          measures: 'Short distances',
-          strength: 'Simple and low cost',
-          limit: 'Short range only',
           degradedIn: [],
           lostIn: [],
         },
       ],
     },
     notes:
-      '[EDIT] Presenter notes.\n\nClick a condition to see which sensors are weakened or lost. Coverage shapes are schematic, not to scale.',
+      '[EDIT] Presenter notes.\n\nEach click changes the condition (night, fog / heavy rain, no open sky). Camera: rich detail, needs light and clear air. Radar: distance and relative speed, works in dark and bad weather, little shape detail. GNSS: position on Earth, needs a view of the sky. IMU: own motion, works anywhere, errors build up over time. Ultrasonic: short distances, simple and low cost. Coverage shapes are schematic, not to scale.',
   },
   {
     id: 'localisation',
     title: 'LOCALISATION\nAND MAPPING',
+    titleSize: 80,
     description:
       'Localisation estimates where a robot is, while mapping represents its environment.',
     theme: 'light',
@@ -272,7 +259,7 @@ export const slides: Slide[] = [
         chosen: 'Chosen route',
       },
     },
-    notes: '[EDIT] Presenter notes.\n\nCandidate routes appear, the safest short route is chosen, then the robot drives it.',
+    notes: '[EDIT] Presenter notes.\n\nClick 1: candidate routes. Click 2: the safe, short one is chosen. Click 3: the robot drives it.',
   },
   {
     id: 'control',
@@ -293,7 +280,7 @@ export const slides: Slide[] = [
       loop: ['Desired', 'Compare', 'Controller', 'Robot', 'Measured'],
     },
     notes:
-      '[EDIT] Presenter notes.\n\nToggle Feedback off to show the robot drifting with no correction; switch it back on to show it converging on the path.',
+      '[EDIT] Presenter notes.\n\nStep 0: feedback on, the robot settles onto the path. Click 1: feedback cut, it drifts away. Click 2: feedback back on, it corrects.',
   },
   {
     id: 'hardware',
@@ -315,7 +302,7 @@ export const slides: Slide[] = [
       estop: 'Emergency stop cuts actuator power',
     },
     notes:
-      '[EDIT] Presenter notes.\n\nThe Jetson plans; the microcontroller handles fast, timing-critical signals; the driver switches motor power. Neither board alone is the vehicle controller.',
+      '[EDIT] Presenter notes.\n\nThe Jetson plans; the microcontroller handles fast, timing-critical signals; the driver switches motor power. Neither board alone is the vehicle controller. Clicks light each connection in turn, then the emergency stop cuts actuator power.',
   },
   {
     id: 'software',
@@ -330,7 +317,7 @@ export const slides: Slide[] = [
       middleware: { label: 'ROS 2', detail: 'Communication layer shared by every component' },
       layers: ['Linux operating system', 'Onboard computer'],
     },
-    notes: '[EDIT] Presenter notes.\n\nEach block is a separate program. None talks to another directly; all exchange data through ROS 2.',
+    notes: '[EDIT] Presenter notes.\n\nEach block is a separate program. None talks to another directly; all exchange data through ROS 2. Clicks highlight the components, ROS 2, then the layers underneath.',
   },
   {
     id: 'communication',
@@ -370,7 +357,7 @@ export const slides: Slide[] = [
       assemble: 'Assemble',
       explode: 'Explode',
     },
-    notes: '[EDIT] Presenter notes.\n\nUse Explode / Assemble to separate the layers. Drag to rotate.',
+    notes: '[EDIT] Presenter notes.\n\nClick 1: the layers separate and are named. Click 2: they come back together with the connections between them lit.',
   },
   {
     id: 'safety',
@@ -392,7 +379,7 @@ export const slides: Slide[] = [
       },
     },
     notes:
-      '[EDIT] Presenter notes.\n\nSoftware handles the detected fault; the hardware e-stop exists for failures software cannot handle.',
+      '[EDIT] Presenter notes.\n\nClick 1: the camera fails and the fault is detected. Click 2: safe state, the robot slows and stops with hazard lights. Click 3: the independent hardware e-stop opens the motor power circuit. Software handles the detected fault; the hardware stop exists for failures software cannot handle.',
   },
   {
     id: 'simulation',
@@ -409,7 +396,7 @@ export const slides: Slide[] = [
       metric: 'Distance to obstacle',
       threshold: 'Safe limit',
     },
-    notes: '[EDIT] Presenter notes.\n\nThe log is generated by the simulated run on screen.',
+    notes: '[EDIT] Presenter notes.\n\nThe log and graph come from the simulated run on screen. Scenario 2 fails on purpose: the obstacle is seen late after the bend. Each click runs the next scenario.',
   },
   {
     id: 'lane-following',
@@ -429,7 +416,7 @@ export const slides: Slide[] = [
         { label: 'Actuate', detail: 'Steering turns the wheels' },
       ],
     },
-    notes: '[EDIT] Presenter notes.\n\nThe highlight steps through each subsystem. Click a stage to hold it; click again to resume.',
+    notes: '[EDIT] Presenter notes.\n\nEach click highlights the next subsystem and shows its contribution in the scene.',
   },
   {
     id: 'obstacle-avoidance',
@@ -449,12 +436,13 @@ export const slides: Slide[] = [
         { label: 'Move', detail: 'Vehicle follows the new path' },
       ],
     },
-    notes: '[EDIT] Presenter notes.\n\nOne continuous run; the phase strip shows which subsystem is active.',
+    notes: '[EDIT] Presenter notes.\n\nStep 0 plays the whole manoeuvre. Each click holds the scene at one phase.',
   },
   {
     id: 'complete-picture',
     kicker: 'The complete picture',
     title: 'ONE SYSTEM.\nMANY\nCOMPONENTS.',
+    titleSize: 108,
     description:
       'Autonomy emerges when sensing, computing, planning, control, and hardware work together.',
     theme: 'dark',

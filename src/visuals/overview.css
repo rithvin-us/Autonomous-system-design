@@ -1,0 +1,64 @@
+/* Slide 02: the three groups, bottom-left; the clicker lights one at a time. */
+.overview-groups {
+  position: absolute;
+  left: 120px;
+  bottom: 110px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  z-index: 3;
+}
+
+.overview-groups li {
+  display: grid;
+  grid-template-columns: 52px 330px auto;
+  align-items: baseline;
+  transition: opacity 240ms;
+}
+
+.overview-groups li.is-dim {
+  opacity: 0.35;
+}
+
+.og-num {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--c-orange);
+}
+
+.og-label {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-stretch: 108%;
+  font-size: 40px;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.overview-groups li.is-active .og-label {
+  color: var(--c-orange);
+}
+
+.og-detail {
+  font-size: 26px;
+  color: var(--muted);
+}
+
+/* Part names on the vehicle */
+.part-chip {
+  font-family: var(--f-body);
+  font-weight: 650;
+  font-size: 19px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 6px 11px;
+  background: var(--c-orange);
+  color: #111;
+  pointer-events: none;
+  transform: translateY(-16px);
+}

@@ -1,138 +1,69 @@
-import { useState } from 'react';
+import { Html } from '@react-three/drei';
+import { useEffect } from 'react';
 import { deck } from '../content/deck';
 import { AssetTag } from '../layouts/AssetTag';
-import { BuggyModel } from '../models/Buggy';
+import { VEHICLE_PARTS, VehicleModel } from '../models/Vehicle';
 import { useSlide } from '../shell/contexts';
-import { requestResetView } from '../shell/events';
-import { IconReset } from '../shell/icons';
+import { RESET_VIEW_EVENT } from '../shell/events';
+import { ModelSource } from '../three/GlbModel';
 import { ModelStage } from '../three/ModelStage';
 import { SnapshotImage } from '../three/SnapshotImage';
 import type { VisualProps } from './registry';
+import './overview.css';
 
-const CANVAS = { inset: 0 } as const;
-
+/**
+ * Slide 02: the whole machine. Clicker steps outline its sensors, its
+ * computing, then its actuators, naming each part on the vehicle.
+ */
 export default function VehicleOverview({ visual }: VisualProps<'vehicleOverview'>) {
-  const { mode, slide } = useSlide();
-  const [active, setActive] = useState<'sensors' | 'computing' | 'actuators' | null>(null);
+  const { mode, slide, step } = useSlide();
+  const active = visual.groups[step - 1]?.id ?? null;
 
-  const camera = {
-    position: [3.2, 1.8, 3.8] as [number, number, number],
-    target: [0.2, 0.4, 0] as [number, number, number],
-    fov: 34,
-    minDistance: 2,
-    maxDistance: 12,
-  };
+  // Each step returns the camera to the front three-quarter view so the outlines are visible.
+  useEffect(() => {
+    if (mode === 'live' && step > 0) window.dispatchEvent(new CustomEvent(RESET_VIEW_EVENT));
+  }, [mode, step]);
 
   return (
     <>
       {mode === 'thumb' ? (
-        <SnapshotImage id={slide.id} style={CANVAS} />
+        <SnapshotImage id={slide.id} style={{ inset: 0 }} />
       ) : (
         <ModelStage
-          camera={camera}
-          autoRotateSpeed={0.5}
+          camera={{ position: [4.3, 2.4, 4.0], target: [0, 0.62, 0.05], fov: 30, minDistance: 2.5, maxDistance: 10 }}
           autoRotate={active === null}
+          autoRotateSpeed={0.35}
           lighting="dark"
-          shadow={{ y: -0.01, opacity: 0.55, scale: 9, blur: 2.5, far: 2.2, live: true }}
+          shadow={{ y: 0.001, opacity: 0.65, scale: 6, blur: 2.2, far: 1.6 }}
           snapshotId={slide.id}
-          style={CANVAS}
+          viewCenterX={0.66}
+          style={{ inset: 0 }}
         >
-          <group position={[0.4, 0, 0]} scale={0.0016}>
-            <BuggyModel highlight={active} />
-          </group>
+          <ModelSource
+            glb={deck.vehicle.glb}
+            transform={deck.vehicle.glbTransform}
+            fallback={<VehicleModel highlight={active} />}
+          />
+          {active &&
+            VEHICLE_PARTS[active].map((p) => (
+              <Html key={p.name} position={[p.position[0], p.position[1] + p.size[1] / 2 + 0.06, p.position[2]]} center zIndexRange={[20, 5]}>
+                <div className="part-chip">{p.name}</div>
+              </Html>
+            ))}
         </ModelStage>
       )}
 
-      {/* Interactive Subsystem Inspector Bar */}
-      <div
-        style={{
-          position: 'absolute',
-          right: 120,
-          bottom: 120,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          gap: 16,
-          zIndex: 10,
-        }}
-      >
-        <div style={{ display: 'flex', gap: 12 }}>
-          {visual.groups.map((g) => {
-            const isSelected = active === g.id;
-            return (
-              <button
-                key={g.id}
-                onClick={() => setActive((cur) => (cur === g.id ? null : g.id))}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  padding: '14px 22px',
-                  borderRadius: 8,
-                  background: isSelected ? 'var(--c-orange)' : 'rgba(26, 28, 31, 0.85)',
-                  color: isSelected ? '#ffffff' : 'var(--c-text-dark)',
-                  border: isSelected ? '1px solid var(--c-orange)' : '1px solid var(--c-line-dark)',
-                  backdropFilter: 'blur(12px)',
-                  cursor: 'pointer',
-                  transition: 'all 180ms ease',
-                  boxShadow: isSelected ? '0 0 24px rgba(255, 106, 19, 0.45)' : 'none',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--f-head)',
-                    fontWeight: 700,
-                    fontSize: 18,
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  {g.label}
-                </span>
-                <span
-                  style={{
-                    fontSize: 13,
-                    opacity: isSelected ? 0.92 : 0.65,
-                    marginTop: 2,
-                  }}
-                >
-                  {g.detail}
-                </span>
-              </button>
-            );
-          })}
+      <ol className="overview-groups">
+        {visual.groups.map((g, i) => (
+          <li key={g.id} className={g.id === active ? 'is-active' : active ? 'is-dim' : ''}>
+            <span className="og-num">{String(i + 1).padStart(2, '0')}</span>
+            <span className="og-label">{g.label}</span>
+            {g.detail && <span className="og-detail">{g.detail}</span>}
+          </li>
+        ))}
+      </ol>
 
-          <button
-            onClick={() => {
-              setActive(null);
-              requestResetView();
-            }}
-            title="Reset view (R)"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '14px 20px',
-              borderRadius: 8,
-              background: 'rgba(26, 28, 31, 0.85)',
-              color: 'var(--c-muted-dark)',
-              border: '1px solid var(--c-line-dark)',
-              cursor: 'pointer',
-              fontFamily: 'var(--f-head)',
-              fontWeight: 600,
-              fontSize: 16,
-            }}
-          >
-            <IconReset />
-            Reset
-          </button>
-        </div>
-
-        <div style={{ fontSize: 13, color: 'var(--c-muted-dark)', letterSpacing: '0.04em' }}>
-          Drag to rotate · Click a subsystem to isolate
-        </div>
-      </div>
-
-      <AssetTag status={deck.vehicle.status} note={deck.vehicle.statusNote} style={{ left: 120, bottom: 56 }} />
+      <AssetTag status={deck.vehicle.status} note={deck.vehicle.statusNote} style={{ right: 120, top: 72 }} />
     </>
   );
 }

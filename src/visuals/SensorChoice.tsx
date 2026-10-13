@@ -1,210 +1,152 @@
-import { useState } from 'react';
+import '../diagram/diagram.css';
+import { RobotTop } from '../diagram/glyphs';
 import { sensors } from '../content/sensors';
+import type { SensorId } from '../content/types';
+import { useTime } from '../lib/useTime';
+import { useSlide } from '../shell/contexts';
 import type { VisualProps } from './registry';
 
+const W = 1680;
+const H = 648;
+const CAR = { x: 470, y: 380 };
+const PANEL_X = 1240;
+
+type Health = 'ok' | 'weak' | 'lost';
+
+function wedge(x: number, y: number, range: number, half: number, dir = 0) {
+  const a0 = dir - half;
+  const a1 = dir + half;
+  return `M${x} ${y} L${x + Math.cos(a0) * range} ${y + Math.sin(a0) * range} A${range} ${range} 0 0 1 ${x + Math.cos(a1) * range} ${y + Math.sin(a1) * range} Z`;
+}
+
+function style(h: Health) {
+  if (h === 'lost') return { fillOpacity: 0, strokeOpacity: 0.35, dash: '6 8', stroke: 'var(--muted)' };
+  if (h === 'weak') return { fillOpacity: 0.05, strokeOpacity: 0.7, dash: '10 8', stroke: 'var(--c-orange)' };
+  return { fillOpacity: 0.12, strokeOpacity: 0.9, dash: undefined, stroke: 'var(--c-orange)' };
+}
+
+/**
+ * Slide 13. Top-down coverage of the five sensors around a vehicle. Clicker
+ * steps change the operating condition; sensors that suffer fade or drop out.
+ */
 export default function SensorChoice({ visual }: VisualProps<'sensorChoice'>) {
-  const [activeCondition, setActiveCondition] = useState('clear');
+  const { step } = useSlide();
+  const t = useTime(1.2);
+  const condition = visual.conditions[Math.min(step, visual.conditions.length - 1)];
+  const health = (id: SensorId): Health => {
+    const s = visual.sensors.find((x) => x.id === id);
+    if (!s) return 'ok';
+    if (s.lostIn.includes(condition.id)) return 'lost';
+    if (s.degradedIn.includes(condition.id)) return 'weak';
+    return 'ok';
+  };
+  const name = (id: SensorId) => sensors[id].shortName;
+  const radarR = ((t * 330) % 540) + 40;
+  const pingR = ((t * 160) % 120) + 10;
+
+  const cam = style(health('zed2i'));
+  const rad = style(health('radar'));
+  const uso = style(health('ultrasonic'));
+  const gnss = health('gnss');
+  const imu = health('imu');
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '10px 0 20px',
-      }}
-    >
-      {/* Condition Selector Buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <span
-          style={{
-            fontFamily: 'var(--f-head)',
-            fontSize: 13,
-            fontWeight: 700,
-            color: 'var(--c-orange)',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            marginRight: 6,
-          }}
-        >
-          Operating Condition:
-        </span>
-        {visual.conditions.map((cond) => {
-          const isSelected = activeCondition === cond.id;
-          return (
-            <button
-              key={cond.id}
-              onClick={() => setActiveCondition(cond.id)}
-              style={{
-                padding: '10px 22px',
-                borderRadius: 8,
-                background: isSelected ? 'var(--c-orange)' : 'var(--bg-2)',
-                color: isSelected ? '#ffffff' : 'var(--c-text-dark)',
-                border: isSelected ? '1px solid var(--c-orange)' : '1px solid var(--line)',
-                cursor: 'pointer',
-                fontFamily: 'var(--f-head)',
-                fontSize: 15,
-                fontWeight: 700,
-                transition: 'all 160ms ease',
-                boxShadow: isSelected ? '0 4px 16px rgba(255, 106, 19, 0.4)' : 'none',
-              }}
-            >
-              {cond.label}
-            </button>
-          );
-        })}
-      </div>
+    <svg className="dg" viewBox={`0 0 ${W} ${H}`} aria-hidden>
+      {/* Condition backdrops */}
+      {condition.id === 'night' && <rect x={0} y={0} width={PANEL_X - 60} height={H} fill="#000" opacity={0.45} />}
+      {condition.id === 'fog' &&
+        Array.from({ length: 7 }, (_, i) => (
+          <rect key={i} x={((i * 260 + t * 40) % (PANEL_X + 200)) - 200} y={60 + (i % 3) * 170} width={420} height={150} fill="var(--fg)" opacity={0.06} rx={75} />
+        ))}
+      {condition.id === 'covered' && (
+        <g>
+          <rect x={CAR.x - 330} y={40} width={660} height={90} fill="var(--bg-3)" stroke="var(--line)" strokeWidth={2} />
+          <text x={CAR.x} y={96} textAnchor="middle" className="dg-label is-muted" style={{ fontSize: 20 }}>
+            Roof · tunnel · trees
+          </text>
+        </g>
+      )}
 
-      {/* 5 Sensor Comparison Cards */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
-          gap: 18,
-          flex: 1,
-          margin: '20px 0',
-        }}
-      >
-        {visual.sensors.map((s) => {
-          const cfg = sensors[s.id];
-          const isLost = s.lostIn.includes(activeCondition);
-          const isDegraded = s.degradedIn.includes(activeCondition);
+      {/* Radar: long, narrow */}
+      <path d={wedge(CAR.x + 70, CAR.y, 560, 0.16)} fill="var(--c-orange)" fillOpacity={rad.fillOpacity * 0.7} stroke={rad.stroke} strokeOpacity={rad.strokeOpacity} strokeWidth={2.5} strokeDasharray={rad.dash} />
+      {health('radar') !== 'lost' && (
+        <path d={`M${CAR.x + 70 + Math.cos(-0.16) * radarR} ${CAR.y + Math.sin(-0.16) * radarR} A${radarR} ${radarR} 0 0 1 ${CAR.x + 70 + Math.cos(0.16) * radarR} ${CAR.y + Math.sin(0.16) * radarR}`} fill="none" stroke="var(--c-orange)" strokeWidth={3} opacity={1 - radarR / 600} />
+      )}
+      <text x={CAR.x + 600} y={CAR.y - 112} textAnchor="middle" className="dg-label" style={{ textTransform: 'none', fontSize: 24 }}>
+        {name('radar')}
+      </text>
 
-          const statusBadge = isLost
-            ? { label: 'LOST / BLIND', bg: 'rgba(226, 59, 46, 0.2)', color: '#e23b2e', border: '#e23b2e' }
-            : isDegraded
-              ? { label: 'DEGRADED', bg: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b', border: '#f59e0b' }
-              : { label: 'OPERATIONAL', bg: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '#10b981' };
+      {/* Stereo camera: medium, wide */}
+      <path d={wedge(CAR.x + 70, CAR.y, 380, 0.62)} fill="var(--c-orange)" fillOpacity={cam.fillOpacity} stroke={cam.stroke} strokeOpacity={cam.strokeOpacity} strokeWidth={2.5} strokeDasharray={cam.dash} />
+      <text x={CAR.x + 70 + Math.cos(-0.62) * 390} y={CAR.y + Math.sin(-0.62) * 390 - 14} className="dg-label" style={{ textTransform: 'none', fontSize: 24, opacity: health('zed2i') === 'lost' ? 0.45 : 1 }}>
+        {name('zed2i')}
+        {health('zed2i') !== 'ok' && ` · ${health('zed2i')}`}
+      </text>
 
-          return (
-            <div
-              key={s.id}
-              style={{
-                borderRadius: 12,
-                background: isLost ? 'rgba(26, 28, 31, 0.5)' : 'var(--bg-2)',
-                border: `1.5px solid ${statusBadge.border}`,
-                padding: '22px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                opacity: isLost ? 0.65 : 1,
-                transition: 'all 200ms ease',
-                boxShadow: !isLost && !isDegraded ? '0 8px 24px rgba(0,0,0,0.18)' : 'none',
-              }}
-            >
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div
-                    style={{
-                      fontFamily: 'var(--f-head)',
-                      fontSize: 20,
-                      fontWeight: 800,
-                      color: 'var(--fg)',
-                    }}
-                  >
-                    {cfg?.shortName || s.id}
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontFamily: 'var(--f-head)',
-                      fontWeight: 800,
-                      letterSpacing: '0.06em',
-                      padding: '4px 8px',
-                      borderRadius: 4,
-                      background: statusBadge.bg,
-                      color: statusBadge.color,
-                      border: `1px solid ${statusBadge.color}`,
-                    }}
-                  >
-                    {statusBadge.label}
-                  </span>
-                </div>
+      {/* Ultrasonic: short fans front and rear */}
+      {[
+        [CAR.x + 70, CAR.y + 34, 0.35],
+        [CAR.x + 70, CAR.y - 34, -0.35],
+        [CAR.x - 70, CAR.y + 34, Math.PI - 0.35],
+        [CAR.x - 70, CAR.y - 34, Math.PI + 0.35],
+      ].map(([x, y, d], i) => (
+        <g key={i}>
+          <path d={wedge(x, y, 120, 0.42, d)} fill="var(--c-orange)" fillOpacity={uso.fillOpacity * 1.6} stroke={uso.stroke} strokeOpacity={uso.strokeOpacity} strokeWidth={2} strokeDasharray={uso.dash} />
+          <path
+            d={`M${x + Math.cos(d - 0.42) * pingR} ${y + Math.sin(d - 0.42) * pingR} A${pingR} ${pingR} 0 0 1 ${x + Math.cos(d + 0.42) * pingR} ${y + Math.sin(d + 0.42) * pingR}`}
+            fill="none"
+            stroke="var(--c-orange)"
+            strokeWidth={2.5}
+            opacity={1 - pingR / 140}
+          />
+        </g>
+      ))}
+      <text x={CAR.x - 210} y={CAR.y + 140} textAnchor="middle" className="dg-label" style={{ textTransform: 'none', fontSize: 24 }}>
+        {name('ultrasonic')}
+      </text>
 
-                <div
-                  style={{
-                    fontSize: 13,
-                    color: 'var(--c-orange)',
-                    fontWeight: 600,
-                    marginTop: 6,
-                    marginBottom: 16,
-                  }}
-                >
-                  {s.measures}
-                </div>
+      {/* GNSS: link to the sky */}
+      <g opacity={gnss === 'lost' ? 0.35 : 1}>
+        <line x1={CAR.x - 20} y1={CAR.y - 40} x2={CAR.x - 120} y2={150} stroke={gnss === 'lost' ? 'var(--muted)' : 'var(--fg)'} strokeWidth={2.5} strokeDasharray="8 8" strokeDashoffset={-t * 30} />
+        <g transform={`translate(${CAR.x - 130} 140)`}>
+          <rect x={-14} y={-10} width={28} height={20} fill="var(--fg)" />
+          <rect x={-46} y={-5} width={28} height={10} fill="var(--muted)" />
+          <rect x={18} y={-5} width={28} height={10} fill="var(--muted)" />
+        </g>
+        <text x={CAR.x - 182} y={150} textAnchor="end" className="dg-label" style={{ textTransform: 'none', fontSize: 24 }}>
+          {name('gnss')}
+          {gnss === 'lost' && ' · lost'}
+        </text>
+        {gnss === 'lost' && <path d={`M${CAR.x - 92} 222 l28 28 M${CAR.x - 64} 222 l-28 28`} stroke="var(--c-fault)" strokeWidth={5} />}
+      </g>
 
-                {/* Strength */}
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 11, textTransform: 'uppercase', color: 'var(--muted)', fontWeight: 700, letterSpacing: '0.06em' }}>
-                    Key Strength
-                  </div>
-                  <div style={{ fontSize: 13, color: 'var(--fg)', marginTop: 2, lineHeight: 1.35 }}>
-                    {s.strength}
-                  </div>
-                </div>
+      <RobotTop x={CAR.x} y={CAR.y} size={150} />
 
-                {/* Limitation */}
-                <div>
-                  <div style={{ fontSize: 11, textTransform: 'uppercase', color: 'var(--muted)', fontWeight: 700, letterSpacing: '0.06em' }}>
-                    Limitation
-                  </div>
-                  <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2, lineHeight: 1.35 }}>
-                    {s.limit}
-                  </div>
-                </div>
-              </div>
+      {/* IMU: inside the vehicle, measuring its own motion */}
+      <g transform={`translate(${CAR.x - 20} ${CAR.y})`} opacity={imu === 'ok' ? 1 : 0.4}>
+        <line x1={0} y1={0} x2={34} y2={0} stroke="var(--c-orange)" strokeWidth={3} />
+        <line x1={0} y1={0} x2={0} y2={-34} stroke="var(--c-orange)" strokeWidth={3} />
+      </g>
+      <text x={CAR.x} y={CAR.y + 104} textAnchor="middle" className="dg-label" style={{ textTransform: 'none', fontSize: 24 }}>
+        {name('imu')}
+      </text>
 
-              {/* Status explanation note */}
-              <div
-                style={{
-                  marginTop: 16,
-                  padding: '10px 12px',
-                  borderRadius: 6,
-                  background: 'var(--bg-3)',
-                  fontSize: 12,
-                  color: isLost || isDegraded ? statusBadge.color : 'var(--muted)',
-                  fontWeight: 500,
-                }}
-              >
-                {isLost
-                  ? 'Sensor signal unavailable under this condition'
-                  : isDegraded
-                    ? 'Performance attenuated by environmental scattering'
-                    : 'Optimal signal-to-noise ratio'}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Synthesis Insight Banner */}
-      <div
-        style={{
-          padding: '14px 24px',
-          borderRadius: 8,
-          background: 'var(--bg-2)',
-          border: '1px solid var(--line)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <span style={{ fontSize: 14, color: 'var(--muted)' }}>
-          Autonomous safety requires <strong>sensor fusion</strong>: combining complementary sensor modalities guarantees perception across all weather conditions.
-        </span>
-        <span
-          style={{
-            fontSize: 13,
-            fontFamily: 'var(--f-head)',
-            fontWeight: 700,
-            color: 'var(--c-orange)',
-          }}
-        >
-          Active condition: {visual.conditions.find((c) => c.id === activeCondition)?.label}
-        </span>
-      </div>
-    </div>
+      {/* Conditions (clicker steps) */}
+      <line x1={PANEL_X - 40} x2={PANEL_X - 40} y1={0} y2={H} stroke="var(--line)" strokeWidth={2} />
+      <text x={PANEL_X} y={30} className="dg-label is-muted" style={{ fontSize: 20 }}>
+        Condition
+      </text>
+      {visual.conditions.map((c, i) => {
+        const active = c.id === condition.id;
+        return (
+          <g key={c.id}>
+            <rect x={PANEL_X} y={66 + i * 92} width={8} height={60} fill={active ? 'var(--c-orange)' : 'var(--line)'} />
+            <text x={PANEL_X + 32} y={108 + i * 92} className="dg-title" style={{ fontSize: 32, fill: active ? 'var(--fg)' : 'var(--muted)' }}>
+              {c.label}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
   );
 }

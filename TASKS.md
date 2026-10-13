@@ -45,8 +45,18 @@ sub-19 px text and off-palette colours. It has been stopped; every slide is bein
 deck's rules: clicker-driven (no mouse), orange/steel palette, projector-legible text.
 
 - [x] T21 Restore slides 24 and 25 after the overwrite
-- [ ] T22 Rewrite slides 03, 04, 05, 06 (clicker steps, no mouse)
-- [ ] T23 Rewrite slides 13–22 (clicker steps, no mouse)
+- [x] T22 Rewrite slides 03, 04, 05, 06 (clicker steps, no mouse)
+- [x] T23 Rewrite slides 13–22 (clicker steps, no mouse)
 
 - [x] T19 Clicker-driven builds: PgDn/PgUp step through each slide's builds (sensor parts tour → demo) before changing slide; ↓/↑ skip; step dots in chrome; "next click" in notes and presenter window
 - [x] T20 `?solo` URL flag: open a copy that does not sync with other windows
+- [x] T24 Remove all on-slide mouse controls; chrome keeps only previous / next
+- [x] T25 Slide 04 switched to presenter-supplied photos (waiting for the four image files)
+- [x] T26 Slides 01/02 rebuilt with a new illustrative buggy (src/models/Vehicle.tsx)
+
+## Open items for the presenter
+
+- Save the four slide-04 photos into public/images/types/ (names in README).
+- Supply the exact Starkenn radar (model name, photos/drawings or CAD) to replace the placeholder.
+- Supply the team vehicle as GLB (deck.ts → vehicle.glb) if you want it instead of the illustrative buggy.
+- Replace [EDIT] presenter notes with your own material.

@@ -2,9 +2,9 @@ import '../diagram/diagram.css';
 import { useTime } from '../lib/useTime';
 import type { VisualProps } from './registry';
 
-const CX = 1395;
+const CX = 1450;
 const CY = 545;
-const R = 318;
+const R = 280;
 const LAP = 7.5; // seconds per loop
 
 /**
@@ -71,9 +71,11 @@ export default function CompletePicture({ visual }: VisualProps<'completePicture
 
       {/* Components */}
       {nodes.map((nd, i) => {
-        const lx = CX + Math.cos(nd.a) * (R + 64);
-        const ly = CY + Math.sin(nd.a) * (R + 64);
-        const anchor = Math.abs(Math.cos(nd.a)) < 0.2 ? 'middle' : Math.cos(nd.a) > 0 ? 'start' : 'end';
+        // Labels sit centred above each node, except the two lowest which sit below.
+        const below = Math.sin(nd.a) > 0.5;
+        const lx = nd.x;
+        const ly = below ? nd.y + 62 : nd.y - 74;
+        const anchor = 'middle';
         return (
           <g key={nd.label}>
             <circle cx={nd.x} cy={nd.y} r={34} fill="var(--c-orange)" opacity={nd.glow * 0.18} />

@@ -49,12 +49,12 @@
   right: 120px;
   top: 84px;
   display: grid;
-  grid-template-columns: 1fr 600px;
-  column-gap: 80px;
+  grid-template-columns: 1fr 560px;
+  column-gap: 64px;
   align-items: end;
 }
 .l-top .title {
-  font-size: 92px;
+  font-size: 84px;
 }
 .l-top .desc {
   padding-bottom: 4px;
@@ -171,47 +171,4 @@
 }
 .asset-tag[data-status='placeholder']::before {
   background: var(--c-orange);
-}
-
-/* ---------- on-slide buttons (toggles inside visuals) ---------- */
-.ctl-row {
-  display: flex;
-  gap: 12px;
-  pointer-events: auto;
-}
-.ctl {
-  appearance: none;
-  border: 1.5px solid color-mix(in srgb, var(--fg) 35%, transparent);
-  background: transparent;
-  color: var(--fg);
-  font-family: var(--f-body);
-  font-weight: 650;
-  font-size: 19px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 13px 20px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  transition:
-    background 140ms,
-    border-color 140ms,
-    color 140ms;
-}
-.ctl:hover {
-  border-color: var(--fg);
-}
-.ctl[aria-pressed='true'] {
-  background: var(--fg);
-  border-color: var(--fg);
-  color: var(--bg);
-}
-.ctl:focus-visible {
-  outline: 3px solid var(--c-orange);
-  outline-offset: 2px;
-}
-.ctl svg {
-  width: 18px;
-  height: 18px;
 }

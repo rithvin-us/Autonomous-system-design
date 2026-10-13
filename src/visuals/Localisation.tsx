@@ -1,216 +1,178 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import '../diagram/diagram.css';
+import { RobotTop } from '../diagram/glyphs';
+import { at, route, upTo, toD, type Pt } from '../diagram/path';
+import { useTime } from '../lib/useTime';
+import { useSlide } from '../shell/contexts';
 import type { VisualProps } from './registry';
 
-const LANDMARKS = [
-  { id: 'L1', x: 180, y: 120, label: 'Feature 01' },
-  { id: 'L2', x: 500, y: 160, label: 'Feature 02' },
-  { id: 'L3', x: 380, y: 420, label: 'Feature 03' },
+const W = 1080;
+const H = 940;
+const CELL = 34;
+const COLS = 27;
+const ROWS = 20;
+const VIEW_R = 4.2; // cells the robot can see around it
+const SPEED = 2.4; // cells per second
+const LOOP_HOLD = 2;
+
+/** Floor plan: '#' wall, '.' free. Rows top to bottom. */
+const PLAN = [
+  '###########################',
+  '#.........#...............#',
+  '#.........................#',
+  '#.........#.......#########',
+  '#.........#.......#.......#',
+  '#.........................#',
+  '#.........................#',
+  '#######...........#.......#',
+  '#.....#...................#',
+  '#.....#...................#',
+  '#.....#######.....#########',
+  '#.................#.......#',
+  '#.................#.......#',
+  '#.....######......#.......#',
+  '#.....#....#..............#',
+  '#.....#....#..............#',
+  '#..........#......#.......#',
+  '#..........#......#.......#',
+  '#..........#......#.......#',
+  '###########################',
 ];
 
+/** Route through the plan, in cell coordinates. */
+const ROUTE: Pt[] = [
+  [3, 17],
+  [3, 11.5],
+  [8.5, 11.5],
+  [14, 11.5],
+  [14, 8.5],
+  [22.5, 8.5],
+  [22.5, 4.5],
+  [22.5, 5.5],
+  [14, 5.5],
+  [14, 2],
+  [4, 2],
+  [4, 5.5],
+];
+
+/** Landmarks the robot can recognise (cell coords, on walls). */
+const LANDMARKS: Pt[] = [
+  [7, 10.2],
+  [18.6, 3.6],
+  [10.6, 3.6],
+];
+
+const px = ([x, y]: Pt): Pt => [x * CELL, y * CELL];
+
+/**
+ * Slide 14. The robot drives through a building it is mapping. Grey cells
+ * appear as its sensors see them (mapping). The ring shows how unsure it is
+ * of its own position: it grows as it drives on motion estimates alone and
+ * snaps small when it recognises a landmark (localisation).
+ * Clicker steps emphasise localisation, then mapping.
+ */
 export default function Localisation({ visual }: VisualProps<'localisation'>) {
-  const [t, setT] = useState(0);
+  const { step } = useSlide();
+  const t = useTime(5);
+  const r = useMemo(() => route(ROUTE.map((p) => [p[0] + 0.5, p[1] + 0.5] as Pt)), []);
+  const duration = r.total / SPEED;
+  const local = t % (duration + LOOP_HOLD);
+  const s = Math.min(r.total, local * SPEED);
+  const pose = at(r, s);
 
-  // Auto-drive around the loop
-  useEffect(() => {
-    let animId: number;
-    const animate = () => {
-      setT((cur) => cur + 0.008);
-      animId = requestAnimationFrame(animate);
-    };
-    animId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animId);
-  }, []);
+  // First distance along the route at which each cell comes into view.
+  const seenAt = useMemo(() => {
+    const out = new Map<string, number>();
+    for (let d = 0; d <= r.total; d += 0.25) {
+      const p = at(r, d);
+      for (let y = Math.floor(p.y - VIEW_R); y <= p.y + VIEW_R; y++)
+        for (let x = Math.floor(p.x - VIEW_R); x <= p.x + VIEW_R; x++) {
+          if (x < 0 || y < 0 || x >= COLS || y >= ROWS) continue;
+          const k = `${x},${y}`;
+          if (!out.has(k) && Math.hypot(x + 0.5 - p.x, y + 0.5 - p.y) <= VIEW_R) out.set(k, d);
+        }
+    }
+    return out;
+  }, [r]);
 
-  // Winding parametric trajectory
-  const angle = t % (Math.PI * 2);
-  const robotX = 340 + Math.cos(angle) * 190;
-  const robotY = 270 + Math.sin(angle * 2) * 110;
-
-  // Measure distance to closest landmark
-  let minLandmarkDist = 999;
-  let activeLandmark: (typeof LANDMARKS)[0] | null = null;
-  for (const lm of LANDMARKS) {
-    const d = Math.hypot(robotX - lm.x, robotY - lm.y);
-    if (d < minLandmarkDist) {
-      minLandmarkDist = d;
-      activeLandmark = lm;
+  // Uncertainty: grows with distance since the last landmark sighting.
+  let lastFix = 0;
+  let fixing: Pt | null = null;
+  for (let d = 0; d <= s; d += 0.25) {
+    const p = at(r, d);
+    for (const lm of LANDMARKS) {
+      if (Math.hypot(lm[0] - p.x, lm[1] - p.y) < 3.2) {
+        lastFix = d;
+        if (s - d < 1.2) fixing = lm;
+      }
     }
   }
+  const sinceFix = s - lastFix;
+  const sigma = Math.min(1.9, 0.35 + sinceFix * 0.16); // cells
+  const drift: Pt = [Math.sin(s * 0.7) * sinceFix * 0.06, Math.cos(s * 0.5) * sinceFix * 0.06];
+  const est: Pt = [pose.x + drift[0], pose.y + drift[1]];
 
-  // Sighting condition: when within 140px of a landmark
-  const isSighting = minLandmarkDist < 140 && activeLandmark !== null;
-
-  // Uncertainty radius: grows over time with phase, drops during landmark update
-  const rawGrowth = 22 + (Math.sin(angle * 4) + 1) * 24;
-  const uncertaintyRadius = isSighting ? Math.max(16, rawGrowth * 0.4) : rawGrowth;
+  const focusLoc = step === 1;
+  const focusMap = step === 2;
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        borderRadius: 12,
-        background: 'var(--bg-2)',
-        border: '1px solid var(--line)',
-        padding: 24,
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontFamily: 'var(--f-head)', fontSize: 20, fontWeight: 800, color: 'var(--fg)' }}>
-          SLAM (Simultaneous Localisation & Mapping)
-        </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <span
-            style={{
-              padding: '6px 14px',
-              borderRadius: 6,
-              background: isSighting ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 106, 19, 0.12)',
-              color: isSighting ? '#10b981' : 'var(--c-orange)',
-              fontFamily: 'var(--f-head)',
-              fontSize: 12,
-              fontWeight: 700,
-            }}
-          >
-            {isSighting ? 'LANDMARK RECOGNIZED (UNCERTAINTY CONTRACTS)' : 'DEAD RECKONING (UNCERTAINTY DRIFT)'}
-          </span>
-        </div>
-      </div>
-
-      {/* 2D SLAM Simulation Arena */}
-      <div style={{ flex: 1, position: 'relative', margin: '14px 0' }}>
-        <svg viewBox="0 0 680 480" style={{ width: '100%', height: '100%' }}>
-          {/* Occupancy grid background tiles */}
-          {Array.from({ length: 12 }).map((_, i) =>
-            Array.from({ length: 9 }).map((_, j) => (
-              <rect
-                key={`tile-${i}-${j}`}
-                x={i * 60}
-                y={j * 55}
-                width={56}
-                height={51}
-                rx={3}
-                fill="var(--bg-3)"
-                opacity={0.35}
-              />
-            ))
+    <svg className="dg" viewBox={`0 0 ${W} ${H}`} aria-hidden>
+      <g transform={`translate(${W - COLS * CELL} 40)`}>
+        {/* Map: only cells seen so far */}
+        <g opacity={focusLoc ? 0.35 : 1} className="dg-fade">
+          {PLAN.flatMap((row, y) =>
+            row.split('').map((c, x) => {
+              const d = seenAt.get(`${x},${y}`);
+              if (d === undefined || d > s) return null;
+              return c === '#' ? (
+                <rect key={`${x},${y}`} x={x * CELL} y={y * CELL} width={CELL} height={CELL} fill="var(--fg)" />
+              ) : (
+                <rect key={`${x},${y}`} x={x * CELL} y={y * CELL} width={CELL} height={CELL} fill="var(--bg-3)" stroke="var(--bg-2)" strokeWidth={1} />
+              );
+            }),
           )}
+          {/* Unseen area outline */}
+          <rect x={0} y={0} width={COLS * CELL} height={ROWS * CELL} fill="none" stroke="var(--line)" strokeWidth={2} strokeDasharray="6 8" />
+        </g>
 
-          {/* Wall Boundaries / Discovered map obstacles */}
-          <rect x={40} y={40} width={600} height={400} fill="none" stroke="var(--line)" strokeWidth={2} strokeDasharray="8,8" />
-          <line x1={40} y1={240} x2={160} y2={240} stroke="var(--line)" strokeWidth={4} />
-          <line x1={520} y1={240} x2={640} y2={240} stroke="var(--line)" strokeWidth={4} />
+        {/* Route travelled */}
+        <path d={toD(upTo(r, s).map(px))} fill="none" stroke="var(--muted)" strokeWidth={3} strokeDasharray="10 8" opacity={focusMap ? 0.4 : 1} />
 
-          {/* Persistent Trajectory Ribbon */}
-          <path
-            d={Array.from({ length: 60 })
-              .map((_, i) => {
-                const a = ((t - i * 0.05) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-                const x = 340 + Math.cos(a) * 190;
-                const y = 270 + Math.sin(a * 2) * 110;
-                return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
-              })
-              .join(' ')}
-            fill="none"
-            stroke="var(--c-orange)"
-            strokeWidth={2}
-            strokeDasharray="4,4"
-            opacity={0.7}
-          />
+        {/* Landmarks */}
+        {LANDMARKS.map((lm, i) => {
+          const seen = (seenAt.get(`${Math.floor(lm[0])},${Math.floor(lm[1])}`) ?? Infinity) <= s;
+          const [x, y] = px(lm);
+          if (!seen) return null;
+          return (
+            <path key={i} d={`M${x} ${y - 16} L${x + 15} ${y + 11} L${x - 15} ${y + 11} Z`} fill={seen ? 'var(--c-orange)' : 'none'} stroke="var(--c-orange)" strokeWidth={3} opacity={focusMap ? 0.4 : 1} />
+          );
+        })}
+        {fixing && <line x1={px(est)[0]} y1={px(est)[1]} x2={px(fixing)[0]} y2={px(fixing)[1]} stroke="var(--c-orange)" strokeWidth={3} strokeDasharray="6 6" />}
 
-          {/* Fixed Landmarks */}
-          {LANDMARKS.map((lm) => {
-            const isTarget = isSighting && activeLandmark?.id === lm.id;
-            return (
-              <g key={lm.id} transform={`translate(${lm.x}, ${lm.y})`}>
-                {/* Sighting ray */}
-                {isTarget && (
-                  <line
-                    x1={0}
-                    y1={0}
-                    x2={robotX - lm.x}
-                    y2={robotY - lm.y}
-                    stroke="#10b981"
-                    strokeWidth={2}
-                    strokeDasharray="6,4"
-                  />
-                )}
-                <circle r={14} fill={isTarget ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 106, 19, 0.15)'} />
-                <polygon
-                  points="0,-12 10,6 -10,6"
-                  fill={isTarget ? '#10b981' : 'var(--c-orange)'}
-                />
-                <text
-                  x={0}
-                  y={22}
-                  textAnchor="middle"
-                  fontSize={11}
-                  fontFamily="var(--f-head)"
-                  fontWeight={700}
-                  fill="var(--fg)"
-                >
-                  {lm.label}
-                </text>
-              </g>
-            );
-          })}
+        {/* True robot, estimated position and its uncertainty */}
+        <RobotTop x={pose.x * CELL} y={pose.y * CELL} angle={pose.angle} size={46} />
+        <g opacity={focusMap ? 0.35 : 1} className="dg-fade">
+          <circle cx={px(est)[0]} cy={px(est)[1]} r={sigma * CELL * 2} fill="var(--c-orange)" fillOpacity={0.14} stroke="var(--c-orange)" strokeWidth={3} />
+          <circle cx={px(est)[0]} cy={px(est)[1]} r={7} fill="var(--c-orange)" />
+        </g>
+      </g>
 
-          {/* Robot & Growing/Shrinking Uncertainty Covariance Ellipse */}
-          <g transform={`translate(${robotX}, ${robotY})`}>
-            {/* Uncertainty Ellipse */}
-            <circle
-              r={uncertaintyRadius}
-              fill={isSighting ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.18)'}
-              stroke={isSighting ? '#10b981' : '#3b82f6'}
-              strokeWidth={1.5}
-            />
-            {/* Robot Heading vector */}
-            <circle r={12} fill="var(--fg)" />
-            <circle r={9} fill="var(--bg)" />
-            <circle r={4} fill="var(--c-orange)" />
+      {/* Legend */}
+      <g transform={`translate(${W - COLS * CELL} ${ROWS * CELL + 100})`}>
+        {[
+          { key: 'map', label: visual.labels.map, swatch: <rect x={0} y={-16} width={22} height={22} fill="var(--fg)" /> },
+          { key: 'est', label: visual.labels.estimate, swatch: <circle cx={11} cy={-5} r={11} fill="var(--c-orange)" fillOpacity={0.2} stroke="var(--c-orange)" strokeWidth={3} /> },
+          { key: 'lm', label: visual.labels.landmark, swatch: <path d="M11 -18 L24 6 L-2 6 Z" fill="var(--c-orange)" /> },
+          { key: 'route', label: visual.labels.route, swatch: <line x1={0} x2={24} y1={-5} y2={-5} stroke="var(--muted)" strokeWidth={3} strokeDasharray="6 5" /> },
+        ].map((item, i) => (
+          <g key={item.key} transform={`translate(${(i % 2) * 440} ${Math.floor(i / 2) * 44})`}>
+            {item.swatch}
+            <text x={38} y={2} className="dg-label" style={{ fontSize: 19 }}>
+              {item.label}
+            </text>
           </g>
-        </svg>
-      </div>
-
-      {/* Legend & Telemetry Bar */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: 16,
-          padding: '12px 18px',
-          borderRadius: 8,
-          background: 'var(--bg-3)',
-          border: '1px solid var(--line)',
-        }}
-      >
-        <div>
-          <div style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 600 }}>{visual.labels.estimate}</div>
-          <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'var(--fg)', marginTop: 2 }}>
-            x: {robotX.toFixed(1)}m, y: {robotY.toFixed(1)}m
-          </div>
-        </div>
-        <div>
-          <div style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 600 }}>{visual.labels.uncertainty}</div>
-          <div style={{ fontFamily: 'monospace', fontSize: 13, color: isSighting ? '#10b981' : '#3b82f6', marginTop: 2 }}>
-            σ: ±{uncertaintyRadius.toFixed(1)} cm
-          </div>
-        </div>
-        <div>
-          <div style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 600 }}>{visual.labels.landmark}</div>
-          <div style={{ fontFamily: 'monospace', fontSize: 13, color: isSighting ? '#10b981' : 'var(--muted)', marginTop: 2 }}>
-            {isSighting ? `${activeLandmark?.label} (Locked)` : 'Searching...'}
-          </div>
-        </div>
-        <div>
-          <div style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 600 }}>{visual.labels.map}</div>
-          <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'var(--c-orange)', marginTop: 2 }}>
-            Occupancy Grid 2D
-          </div>
-        </div>
-      </div>
-    </div>
+        ))}
+      </g>
+    </svg>
   );
 }
