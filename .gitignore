@@ -1,3 +1,5 @@
 node_modules
 WhatsApp Video*.mp4
 .DS_Store
+
+.vercel
