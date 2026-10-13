@@ -1,0 +1,217 @@
+/* All measurements are at the native 1920x1080 stage size. */
+
+.slide .visual {
+  position: absolute;
+}
+
+.slide .heading {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.slide .title {
+  white-space: pre-line;
+  color: var(--fg);
+}
+
+.slide .kicker {
+  color: var(--c-orange);
+  margin-bottom: 28px;
+}
+
+/* ---------- title ---------- */
+.l-title .visual {
+  inset: 0;
+}
+.l-title .heading {
+  left: 120px;
+  bottom: 118px;
+  width: 1400px;
+}
+.l-title .title {
+  font-size: 148px;
+  line-height: 0.88;
+}
+.l-title .subtitle {
+  margin-top: 36px;
+  font-family: var(--f-head);
+  font-weight: 700;
+  font-stretch: 112%;
+  font-size: 46px;
+  letter-spacing: 0.06em;
+  color: var(--c-orange);
+}
+
+/* ---------- top ---------- */
+.l-top .heading {
+  left: 120px;
+  right: 120px;
+  top: 84px;
+  display: grid;
+  grid-template-columns: 1fr 600px;
+  column-gap: 80px;
+  align-items: end;
+}
+.l-top .title {
+  font-size: 92px;
+}
+.l-top .desc {
+  padding-bottom: 4px;
+}
+.l-top .visual {
+  left: 120px;
+  right: 120px;
+  top: 340px;
+  bottom: 92px;
+}
+
+/* ---------- left ---------- */
+.l-left .heading {
+  left: 120px;
+  top: 112px;
+  width: 620px;
+}
+.l-left .title {
+  font-size: 98px;
+}
+.l-left .desc {
+  margin-top: 44px;
+  max-width: 560px;
+}
+.l-left .visual {
+  left: 760px;
+  right: 80px;
+  top: 60px;
+  bottom: 80px;
+}
+
+/* ---------- overlay ---------- */
+.l-overlay .visual {
+  inset: 0;
+}
+.l-overlay .heading {
+  left: 120px;
+  top: 104px;
+  width: 760px;
+}
+.l-overlay .title {
+  font-size: 104px;
+}
+.l-overlay .desc {
+  margin-top: 40px;
+  max-width: 600px;
+}
+
+/* ---------- showcase (sensor hardware) ---------- */
+.l-showcase {
+  background: var(--studio);
+}
+.l-showcase .visual {
+  inset: 0;
+}
+.l-showcase .heading {
+  left: 120px;
+  top: 112px;
+  width: 560px;
+}
+.l-showcase .title {
+  font-size: 112px;
+}
+.l-showcase .desc {
+  margin-top: 40px;
+  max-width: 500px;
+}
+
+/* ---------- statement ---------- */
+.l-statement .visual {
+  inset: 0;
+}
+.l-statement .heading {
+  left: 120px;
+  top: 150px;
+  width: 820px;
+}
+.l-statement .title {
+  font-size: 132px;
+}
+.l-statement .desc {
+  margin-top: 56px;
+  max-width: 640px;
+}
+
+/* ---------- asset status tag ---------- */
+.asset-tag {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 16px 9px 14px;
+  border: 1.5px solid color-mix(in srgb, var(--fg) 30%, transparent);
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.asset-tag::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--muted);
+}
+.asset-tag[data-status='placeholder'] {
+  border-style: dashed;
+  border-color: var(--c-orange);
+  color: var(--fg);
+}
+.asset-tag[data-status='placeholder']::before {
+  background: var(--c-orange);
+}
+
+/* ---------- on-slide buttons (toggles inside visuals) ---------- */
+.ctl-row {
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+}
+.ctl {
+  appearance: none;
+  border: 1.5px solid color-mix(in srgb, var(--fg) 35%, transparent);
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--f-body);
+  font-weight: 650;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 13px 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition:
+    background 140ms,
+    border-color 140ms,
+    color 140ms;
+}
+.ctl:hover {
+  border-color: var(--fg);
+}
+.ctl[aria-pressed='true'] {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+}
+.ctl:focus-visible {
+  outline: 3px solid var(--c-orange);
+  outline-offset: 2px;
+}
+.ctl svg {
+  width: 18px;
+  height: 18px;
+}

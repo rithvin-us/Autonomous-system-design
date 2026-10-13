@@ -1,0 +1,281 @@
+import type { SensorConfig, SensorId } from './types';
+
+/**
+ * Sensor hardware definitions for the showcase slides.
+ *
+ * Model units are millimetres. Hotspot positions are in the same units and
+ * are measured from the model's centre.
+ *
+ * To use a real CAD export instead of the built-in model, put a .glb file in
+ * /public/models and set `glb: 'models/your-file.glb'` (see README).
+ */
+export const sensors: Record<SensorId, SensorConfig> = {
+  zed2i: {
+    id: 'zed2i',
+    measures: 'Images + depth',
+    name: 'Stereolabs ZED 2i',
+    shortName: 'ZED 2i',
+    status: 'illustrative',
+    statusNote: 'Illustrative reconstruction · dimensions from Stereolabs drawing',
+    displayScale: 0.012,
+    camera: { position: [2.1, 0.95, 3.5], target: [0, 0, 0], fov: 30, minDistance: 1.8, maxDistance: 14 },
+    autoRotateSpeed: 0.55,
+    demoLabel: 'Depth',
+    hotspots: [
+      {
+        id: 'left-lens',
+        label: 'Left camera',
+        detail: 'Wide-angle lens and image sensor',
+        position: [-60, 0, 18.5],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'right-lens',
+        label: 'Right camera',
+        detail: '120 mm from the left camera (baseline)',
+        position: [60, 0, 18.5],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'enclosure',
+        label: 'Aluminium enclosure',
+        detail: 'Sealed to IP66 against dust and water',
+        position: [-30, 15.2, -2],
+        normal: [0, 1, 0],
+      },
+      {
+        id: 'usb',
+        label: 'USB 3.0 Type-C',
+        detail: 'Locking connector with two thumbscrews',
+        position: [0, -1, -22.5],
+        normal: [0, 0, -1],
+      },
+      {
+        id: 'rear-mount',
+        label: 'Rear mounting points',
+        detail: '4 × M3 threaded holes',
+        position: [76.7, 7, -15.7],
+        normal: [0, 0, -1],
+      },
+      {
+        id: 'tripod',
+        label: 'Tripod thread',
+        detail: '¼"-20 UNC plus 2 × M3 on the flat base',
+        position: [0, -15.2, 2],
+        normal: [0, -1, 0],
+      },
+    ],
+    sources: [
+      'Stereolabs ZED 2i technical drawing, rev. 1 (26/05/21): 175.25 × 30.25 mm front, 120 mm baseline, Ø19.25 lens bezels, ¼"-20 + 2× M3 base, 4× M3 rear, USB-C with 2× M2.5 locking holes.',
+      'stereolabs.com/zed-2i: aluminium enclosure, IP66, USB 3.0 Type-C with dual locking screws.',
+    ],
+  },
+
+  radar: {
+    id: 'radar',
+    measures: 'Distance + relative speed',
+    name: 'Starkenn radar',
+    shortName: 'Radar',
+    status: 'placeholder',
+    statusNote: 'Placeholder geometry · exact Starkenn unit pending',
+    displayScale: 0.0145,
+    camera: { position: [2.3, 1.1, 3.9], target: [0, 0, 0], fov: 30, minDistance: 1.8, maxDistance: 14 },
+    autoRotateSpeed: 0.55,
+    demoLabel: 'Detection',
+    hotspots: [
+      {
+        id: 'face',
+        label: 'Sensing face (radome)',
+        detail: 'Radio waves leave and return through this cover',
+        position: [0, 6, 14.2],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'housing',
+        label: 'Housing',
+        detail: 'Exact shape and size pending',
+        position: [46.2, 6, -2],
+        normal: [1, 0, 0],
+      },
+      {
+        id: 'mount',
+        label: 'Mounting bracket',
+        detail: 'Exact arrangement pending',
+        position: [0, -43.2, 4],
+        normal: [0, -1, 0],
+      },
+      {
+        id: 'connector',
+        label: 'Connector',
+        detail: 'Type and position pending',
+        position: [36, -14, -24.2],
+        normal: [0, 0, -1],
+      },
+    ],
+    sources: ['No reference supplied yet. Geometry is a neutral stand-in; replace with the exact Starkenn unit.'],
+  },
+
+  gnss: {
+    id: 'gnss',
+    measures: 'Position on Earth',
+    name: 'GNSS antenna + receiver',
+    shortName: 'GNSS',
+    status: 'illustrative',
+    statusNote: 'Illustrative hardware · not a specific product',
+    displayScale: 0.0135,
+    camera: { position: [1.85, 1.65, 3.05], target: [0, 0.12, 0], fov: 30, minDistance: 1.8, maxDistance: 14 },
+    autoRotateSpeed: 0.5,
+    demoLabel: 'Satellites',
+    hotspots: [
+      {
+        id: 'radome',
+        label: 'Antenna',
+        detail: 'Receives satellite signals under a protective dome',
+        position: [-39, 25.8, 0],
+        normal: [0, 1, 0],
+      },
+      {
+        id: 'base',
+        label: 'Ground plane base',
+        detail: 'Helps reject signals reflected from below',
+        position: [-39, 3, 37.8],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'cable',
+        label: 'Coaxial cable',
+        detail: 'Carries the antenna signal to the receiver',
+        position: [11, 4, 14.5],
+        normal: [0, 1, 0],
+      },
+      {
+        id: 'receiver',
+        label: 'Receiver module',
+        detail: 'Turns satellite signals into a position estimate',
+        position: [50, 4.2, -6],
+        normal: [0, 1, 0],
+      },
+      {
+        id: 'output',
+        label: 'Data connector',
+        detail: 'Sends position to the onboard computer',
+        position: [72.2, 4.5, -6],
+        normal: [1, 0, 0],
+      },
+    ],
+    sources: ['Generic puck antenna and receiver board drawn for illustration; no product dimensions claimed.'],
+  },
+
+  imu: {
+    id: 'imu',
+    measures: 'Acceleration + rotation',
+    name: 'IMU module',
+    shortName: 'IMU',
+    status: 'illustrative',
+    statusNote: 'Illustrative module · not a specific product',
+    displayScale: 0.075,
+    camera: { position: [1.9, 2.0, 3.4], target: [0, -0.18, 0], fov: 30, minDistance: 1.6, maxDistance: 14 },
+    autoRotateSpeed: 0.55,
+    demoLabel: 'Motion',
+    hotspots: [
+      {
+        id: 'chip',
+        label: 'IMU chip',
+        detail: 'Accelerometer + gyroscope in one package',
+        position: [0, 1.8, 0],
+        normal: [0, 1, 0],
+      },
+      {
+        id: 'axes',
+        label: 'Axis markings',
+        detail: 'Directions the chip measures along',
+        position: [7.6, 0.9, 3.2],
+        normal: [0, 1, 0],
+      },
+      {
+        id: 'holes',
+        label: 'Mounting holes',
+        detail: 'Fix the board rigidly to the robot',
+        position: [-9.5, 0.9, -7],
+        normal: [0, 1, 0],
+      },
+      {
+        id: 'header',
+        label: 'Connector pins',
+        detail: 'Power and data to the controller',
+        position: [0, 0.9, 9.2],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'board',
+        label: 'Circuit board',
+        detail: 'Carries the chip and supporting parts',
+        position: [-7, 0.9, 3],
+        normal: [0, 1, 0],
+      },
+    ],
+    sources: ['Generic breakout board drawn for illustration; no product dimensions claimed.'],
+  },
+
+  ultrasonic: {
+    id: 'ultrasonic',
+    measures: 'Short distances',
+    name: 'HC-SR04 ultrasonic module',
+    shortName: 'Ultrasonic',
+    status: 'illustrative',
+    statusNote: 'Illustrative HC-SR04 · typical vendor dimensions',
+    displayScale: 0.042,
+    camera: { position: [1.9, 0.85, 4.1], target: [0, -0.12, 0.2], fov: 30, minDistance: 1.6, maxDistance: 14 },
+    autoRotateSpeed: 0.55,
+    demoLabel: 'Echo',
+    hotspots: [
+      {
+        id: 'tx',
+        label: 'Transmitter (T)',
+        detail: 'Sends a short burst of ultrasound',
+        position: [-13, 2, 12],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'rx',
+        label: 'Receiver (R)',
+        detail: 'Listens for the returning echo',
+        position: [13, 2, 12],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'crystal',
+        label: 'Crystal oscillator',
+        detail: 'Timing reference for the measurement',
+        position: [0, 6.5, 4.4],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'pins',
+        label: 'Pins: VCC · TRIG · ECHO · GND',
+        detail: 'Trigger a pulse, read the echo time',
+        position: [0, -15.5, -2.05],
+        normal: [0, -1, 0],
+      },
+      {
+        id: 'holes',
+        label: 'Mounting holes',
+        detail: 'One in each corner',
+        position: [-20.2, 7.8, 0.8],
+        normal: [0, 0, 1],
+      },
+      {
+        id: 'driver',
+        label: 'Driver circuitry',
+        detail: 'Drives the transmitter and amplifies the echo',
+        position: [0, -2, -2.4],
+        normal: [0, 0, -1],
+      },
+    ],
+    sources: [
+      'Typical HC-SR04 vendor data: 45 × 20 × 15 mm module, two ~16 mm transducers marked T and R, 4-pin header (VCC, Trig, Echo, Gnd).',
+    ],
+  },
+};
+
+export const sensorOrder: SensorId[] = ['zed2i', 'radar', 'gnss', 'imu', 'ultrasonic'];

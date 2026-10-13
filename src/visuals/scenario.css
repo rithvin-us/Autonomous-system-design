@@ -1,0 +1,134 @@
+/* ---------- stage strip (slides 23, 24) ---------- */
+.phase-strip {
+  position: absolute;
+  left: 120px;
+  right: 120px;
+  bottom: 92px;
+  z-index: 4;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.phase-cell {
+  border-top: 4px solid var(--line);
+  padding: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 200ms;
+}
+
+.phase-num {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.phase-label {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-stretch: 108%;
+  font-size: 32px;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--muted);
+  transition: color 200ms;
+}
+
+.phase-detail {
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+.phase-strip li.is-done .phase-cell {
+  border-top-color: color-mix(in srgb, var(--c-orange) 45%, transparent);
+}
+
+.phase-strip li.is-active .phase-cell {
+  border-top-color: var(--c-orange);
+}
+
+.phase-strip li.is-active .phase-num,
+.phase-strip li.is-active .phase-label {
+  color: var(--c-orange);
+}
+
+.phase-strip li.is-active .phase-detail {
+  color: var(--fg);
+  opacity: 1;
+}
+
+/* ---------- in-scene chips ---------- */
+.scene-chip {
+  font-family: var(--f-body);
+  font-weight: 650;
+  font-size: 19px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 7px 12px;
+  background: var(--fg);
+  color: var(--bg);
+  pointer-events: none;
+}
+.scene-chip.is-accent {
+  background: var(--c-orange);
+  color: #111;
+}
+.scene-chip.is-fault {
+  background: var(--c-fault);
+  color: #fff;
+}
+
+/* ---------- small HUD panel ---------- */
+.scenario-hud {
+  position: absolute;
+  right: 120px;
+  top: 120px;
+  z-index: 4;
+  width: 340px;
+  background: var(--bg-2);
+  border-left: 4px solid var(--c-orange);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hud-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.hud-row span {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hud-row strong {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-size: 30px;
+  color: var(--fg);
+  text-transform: uppercase;
+}
+
+/* Keeps the stage strip legible over a full-bleed scene */
+.scenario-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 300px;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--bg) 92%, transparent) 55%);
+}

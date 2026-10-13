@@ -1,0 +1,266 @@
+.viewport-fit {
+  position: absolute !important;
+  inset: 0;
+}
+
+.hide-cursor,
+.hide-cursor * {
+  cursor: none !important;
+}
+
+/* ---------- chrome: counter, buttons, progress ---------- */
+.chrome {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 0;
+  z-index: 20;
+  color: var(--fg);
+}
+
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+}
+.progress-fill {
+  height: 100%;
+  background: color-mix(in srgb, var(--fg) 42%, transparent);
+  transition: width 260ms ease-out;
+}
+
+.nav {
+  position: absolute;
+  right: 44px;
+  bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.nav-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0.38;
+  transition: opacity 140ms;
+}
+.nav-btn svg {
+  width: 24px;
+  height: 24px;
+}
+.nav-btn:hover:not(:disabled) {
+  opacity: 1;
+}
+.nav-btn:disabled {
+  opacity: 0.12;
+  cursor: default;
+}
+.nav-btn:focus-visible {
+  outline: 3px solid var(--c-orange);
+  outline-offset: -3px;
+  opacity: 1;
+}
+
+.counter {
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  padding: 0 10px;
+  min-width: 108px;
+  text-align: center;
+}
+.counter-now {
+  color: var(--fg);
+}
+.counter-sep {
+  margin: 0 8px;
+  opacity: 0.6;
+}
+
+/* ---------- overview ---------- */
+.overview {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: var(--c-ink);
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+}
+.overview-head {
+  width: 1604px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 28px;
+  color: var(--muted);
+}
+.overview-head .t-label {
+  color: var(--fg);
+}
+.overview-hint {
+  font-size: 20px;
+}
+.overview-grid {
+  display: grid;
+  gap: 24px 26px;
+}
+.thumb {
+  position: relative;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: #000;
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+}
+.thumb-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+.thumb-num {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  font-size: 18px;
+  padding: 4px 9px;
+  background: var(--c-ink);
+  color: var(--fg);
+}
+.thumb.is-current .thumb-num {
+  background: var(--c-orange);
+  color: #111;
+}
+.thumb.is-selected,
+.thumb:focus-visible {
+  outline-color: var(--c-orange);
+}
+
+/* ---------- notes ---------- */
+.notes-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 620px;
+  z-index: 30;
+  background: color-mix(in srgb, var(--c-ink) 96%, transparent);
+  border-left: 1px solid var(--line);
+  color: var(--fg);
+  padding: 64px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.notes-head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--c-orange);
+}
+.notes-count {
+  color: var(--muted);
+  font-size: 22px;
+}
+.notes-title {
+  margin: 0;
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-size: 38px;
+  line-height: 1.05;
+}
+.notes-body {
+  font-size: 27px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  color: var(--fg);
+  flex: 1;
+  overflow: hidden;
+}
+.notes-next {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 24px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+}
+.notes-keys {
+  font-size: 18px;
+  color: var(--muted);
+}
+
+/* ---------- help ---------- */
+.help {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  background: color-mix(in srgb, var(--c-ink) 92%, transparent);
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 120px;
+}
+.help-title {
+  color: var(--c-orange);
+  margin-bottom: 32px;
+}
+.help dl {
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+.help-row {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  font-size: 30px;
+}
+.help dt {
+  font-family: var(--f-head);
+  font-weight: 700;
+}
+.help dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+.blackout {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: #000;
+}
+
+/* Build steps on the current slide */
+.steps {
+  display: flex;
+  gap: 7px;
+  margin-right: 14px;
+}
+.steps span {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid color-mix(in srgb, var(--fg) 45%, transparent);
+}
+.steps span.is-done {
+  background: var(--c-orange);
+  border-color: var(--c-orange);
+}

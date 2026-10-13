@@ -1,0 +1,118 @@
+/* Slide 04: a single row of photos, labels under each, shared principle below. */
+.types-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  column-gap: 16px;
+}
+
+.types-row li {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  transition: opacity 260ms;
+}
+
+.types-row li.is-dim {
+  opacity: 0.32;
+}
+
+.types-frame {
+  position: relative;
+  height: 400px;
+  overflow: hidden;
+  background: var(--bg-2);
+  border-top: 6px solid transparent;
+  transition: border-color 260ms;
+}
+
+.types-row li.is-active .types-frame {
+  border-top-color: var(--c-orange);
+}
+
+.types-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.types-missing {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 2px dashed var(--line);
+  color: var(--muted);
+  font-size: 22px;
+  text-align: center;
+  padding: 20px;
+}
+
+.types-missing span {
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.types-missing code {
+  font-family: var(--f-body);
+  font-size: 18px;
+  word-break: break-all;
+}
+
+.types-label {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-stretch: 106%;
+  font-size: 30px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--fg);
+  transition: color 260ms;
+}
+
+.types-row li.is-active .types-label {
+  color: var(--c-orange);
+}
+
+.types-note {
+  margin-top: -8px;
+  font-size: 20px;
+  color: var(--muted);
+}
+
+/* A single bracket spanning all four, carrying what they share */
+.types-shared {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  height: 36px;
+  border: 3px solid var(--fg);
+  border-top: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.types-shared span {
+  position: relative;
+  top: 18px;
+  padding: 0 24px;
+  background: var(--bg);
+  font-family: var(--f-body);
+  font-weight: 650;
+  font-size: 26px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-orange);
+}

@@ -1,0 +1,86 @@
+/* Soft studio sweep behind the hardware */
+.l-showcase {
+  background:
+    radial-gradient(ellipse 70% 80% at 66% 52%, color-mix(in srgb, #fff 55%, var(--studio)) 0%, var(--studio) 70%);
+}
+
+/* ---------- demo read-outs (inside the 3D view) ---------- */
+.demo-readout {
+  position: absolute;
+  z-index: 4;
+  right: 96px;
+  bottom: 118px;
+  width: 400px;
+  background: var(--c-ink);
+  color: var(--c-text-dark);
+  padding: 24px 28px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  pointer-events: none;
+}
+
+.imu-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.readout-label {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted-dark);
+}
+
+.imu-meter-track {
+  position: relative;
+  height: 14px;
+  background: var(--c-ink-3);
+}
+
+.imu-meter-track::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: var(--c-muted-dark);
+}
+
+.imu-meter-fill {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  transform-origin: 0 50%;
+  background: var(--c-text-dark);
+}
+
+.imu-meter-track.is-accent .imu-meter-fill {
+  background: var(--c-orange);
+}
+
+.echo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.echo-row strong {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-size: 40px;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-orange);
+}
+
+.echo-note {
+  font-size: 18px;
+  color: var(--c-muted-dark);
+  border-top: 1px solid var(--c-line-dark);
+  padding-top: 14px;
+}

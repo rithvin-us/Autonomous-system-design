@@ -1,0 +1,1 @@
+import{_ as e,a as t,c as n,d as r,f as i,i as a,l as o,o as s,s as c}from"./SnapshotImage-ASkum8ZF.js";var l={zed2i:{Model:t,floorY:-a.height/2,size:a.width},radar:{Model:c,floorY:-s.height/2-5,size:s.width+10},gnss:{Model:e,floorY:0,size:150},imu:{Model:o,floorY:n,size:26},ultrasonic:{Model:i,floorY:r,size:45}};export{l as t};

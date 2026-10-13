@@ -1,0 +1,135 @@
+/* ---------- Reset and page lock (no page scroll, ever) ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  position: fixed;
+  inset: 0;
+  background: #08090a;
+  color: var(--c-text-dark);
+  font-family: var(--f-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* ---------- Stage: fixed 1920x1080 canvas, scaled to fit ---------- */
+.viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #08090a;
+  touch-action: none;
+}
+
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- Slide themes ---------- */
+.slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+[data-theme='dark'] {
+  --bg: var(--c-ink);
+  --bg-2: var(--c-ink-2);
+  --bg-3: var(--c-ink-3);
+  --fg: var(--c-text-dark);
+  --muted: var(--c-muted-dark);
+  --line: var(--c-line-dark);
+  --studio: var(--c-studio-dark);
+}
+
+[data-theme='light'] {
+  --bg: var(--c-paper);
+  --bg-2: var(--c-paper-2);
+  --bg-3: var(--c-paper-3);
+  --fg: var(--c-text-light);
+  --muted: var(--c-muted-light);
+  --line: var(--c-line-light);
+  --studio: var(--c-studio-light);
+}
+
+.slide.is-entering {
+  animation: slide-in 260ms ease-out both;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- Typography ---------- */
+.h-display {
+  font-family: var(--f-head);
+  font-weight: var(--f-head-weight);
+  font-stretch: var(--f-head-stretch);
+  letter-spacing: -0.012em;
+  line-height: 0.9;
+  margin: 0;
+}
+
+.t-desc {
+  font-family: var(--f-body);
+  font-weight: 450;
+  font-size: 34px;
+  line-height: 1.32;
+  color: var(--muted);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.t-label {
+  font-family: var(--f-body);
+  font-weight: 650;
+  font-size: 22px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.t-num {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-stretch: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+/* SVG text defaults for diagrams */
+.diagram text {
+  font-family: var(--f-body);
+}

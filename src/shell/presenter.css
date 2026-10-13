@@ -1,0 +1,110 @@
+.presenter {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 24px 28px;
+  padding: 28px;
+  background: var(--c-ink);
+  color: var(--fg);
+}
+
+.p-current,
+.p-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.p-label {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.p-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.p-next {
+  max-height: 32vh;
+}
+
+.p-end {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 20px;
+}
+
+.p-notes {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-size: 24px;
+  line-height: 1.45;
+  padding-right: 8px;
+}
+
+.p-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.p-timer {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--c-orange);
+  font-size: 44px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.p-clock {
+  font-size: 28px;
+  color: var(--muted);
+}
+
+.p-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.p-nav button {
+  appearance: none;
+  width: 64px;
+  height: 52px;
+  border: 1.5px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.p-nav button:disabled {
+  opacity: 0.3;
+}
+
+.p-nav svg {
+  width: 26px;
+  height: 26px;
+}
+
+.p-nextclick {
+  font-family: var(--f-head);
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1.15;
+  color: var(--c-orange);
+}
