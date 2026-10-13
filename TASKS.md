@@ -60,3 +60,12 @@ deck's rules: clicker-driven (no mouse), orange/steel palette, projector-legible
 - Supply the exact Starkenn radar (model name, photos/drawings or CAD) to replace the placeholder.
 - Supply the team vehicle as GLB (deck.ts → vehicle.glb) if you want it instead of the illustrative buggy.
 - Replace [EDIT] presenter notes with your own material.
+
+## Round 3 (requested 14:20)
+
+- [x] T27 Remove the "Film character" marking on slide 04
+- [ ] T28 More detailed, realistic slide 04 models (robotaxi, AMRs, drone + dock, humanoid)
+- [ ] T29 System-design emphasis: per-slide design-lens kickers, notes reframed around design decisions
+- [ ] T30 script.md: speaking script for all 25 slides, system-design centred
+- [ ] T31 Verify every slide and step in the presentation
+- [ ] T32 Deploy to Vercel and share the link

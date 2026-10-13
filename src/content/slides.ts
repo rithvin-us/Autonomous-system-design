@@ -67,7 +67,6 @@ export const slides: Slide[] = [
         {
           id: 'robot',
           label: 'Robotic machines',
-          detail: 'Film character',
           image: 'images/types/robotic-machine.png',
           focus: '50% 30%',
         },
