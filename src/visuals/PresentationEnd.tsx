@@ -99,6 +99,11 @@ export default function PresentationEnd({ visual }: VisualProps<'presentationEnd
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
+  const resolvedVideoSrc =
+    visual.videoSrc.startsWith('http') || visual.videoSrc.startsWith('data:')
+      ? visual.videoSrc
+      : `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${visual.videoSrc.replace(/^\//, '')}`;
+
   return (
     <div className="presentation-end-wrapper" onClick={(e) => {
       // If clicking outside controls, toggle play/pause or unmute
@@ -112,7 +117,7 @@ export default function PresentationEnd({ visual }: VisualProps<'presentationEnd
       <div className="pe-video-container">
         <video
           ref={videoRef}
-          src={visual.videoSrc}
+          src={resolvedVideoSrc}
           className="pe-video"
           playsInline
           loop
