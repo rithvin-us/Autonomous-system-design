@@ -230,7 +230,7 @@ function ViewOffset({ cx = 0.5, cy = 0.5 }: { cx?: number; cy?: number }) {
         size.width,
         size.height,
         -(cx - 0.5) * size.width,
-        (cy - 0.5) * size.height,
+        -(cy - 0.5) * size.height,
         size.width,
         size.height,
       );

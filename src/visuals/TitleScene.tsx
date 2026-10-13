@@ -25,8 +25,8 @@ export default function TitleScene(_props: VisualProps<'titleScene'>) {
           lighting="dark"
           shadow={{ y: 0.001, opacity: 0.65, scale: 3.6, blur: 2.0, far: 1.6 }}
           snapshotId={slide.id}
-          viewCenterX={0.68}
-          viewCenterY={0.65}
+          viewCenterX={0.64}
+          viewCenterY={0.70}
           style={{ inset: 0 }}
         >
           {/* Warm rim light from behind */}

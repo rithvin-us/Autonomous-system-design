@@ -1,1 +1,0 @@
-import{d as e,u as t}from"./index-COF5agzd.js";var n=t();function r({status:t,note:r,style:i}){return!e.showAssetTags||t===`verified`?null:(0,n.jsx)(`div`,{className:`asset-tag`,"data-status":t,style:i,children:r})}export{r as t};
