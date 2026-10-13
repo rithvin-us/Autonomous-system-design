@@ -21,16 +21,18 @@ export function SlideFrame({
       aria-label={slide.title.replace(/\n/g, ' ')}
     >
       <div className="visual">{children}</div>
-      <header className="heading">
-        <div className="heading-main">
-          {slide.kicker && <div className="kicker t-label">{slide.kicker}</div>}
-          <h1 className="h-display title" style={titleStyle}>
-            {slide.title}
-          </h1>
-          {slide.subtitle && <div className="subtitle">{slide.subtitle}</div>}
-        </div>
-        {slide.description && <p className="t-desc desc">{slide.description}</p>}
-      </header>
+      {!slide.hideHeading && (
+        <header className="heading">
+          <div className="heading-main">
+            {slide.kicker && <div className="kicker t-label">{slide.kicker}</div>}
+            <h1 className="h-display title" style={titleStyle}>
+              {slide.title}
+            </h1>
+            {slide.subtitle && <div className="subtitle">{slide.subtitle}</div>}
+          </div>
+          {slide.description && <p className="t-desc desc">{slide.description}</p>}
+        </header>
+      )}
     </section>
   );
 }

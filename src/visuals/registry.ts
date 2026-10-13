@@ -28,4 +28,5 @@ export const visuals: Registry = {
   laneFollowing: lazy(() => import('./LaneFollowing')),
   obstacleAvoidance: lazy(() => import('./ObstacleAvoidance')),
   completePicture: lazy(() => import('./CompletePicture')),
+  presentationEnd: lazy(() => import('./PresentationEnd')),
 };

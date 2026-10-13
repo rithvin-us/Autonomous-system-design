@@ -420,6 +420,13 @@ Thank you.
 
 ---
 
+## 27 · Conclusion & Q&A
+
+Outro animation video ("That's the end of our presentation. Any questions?").
+Open the floor for questions and discussion from the audience.
+
+---
+
 ## Appendix: the system-design thread, slide by slide
 
 | Slide | Design idea |
@@ -443,3 +450,4 @@ Thank you.
 | 23 | Verification against requirements |
 | 24–25 | End-to-end behaviour of the whole system |
 | 26 | Autonomy emerges from the system |
+| 27 | Outro & audience Q&A |

@@ -35,6 +35,8 @@ export interface Slide {
   layout: Layout;
   /** Optional heading size override in px (at 1920x1080). */
   titleSize?: number;
+  /** When true, visual occupies full slide without the HTML heading overlay. */
+  hideHeading?: boolean;
   visual: Visual;
   /** Presenter-only notes. Never shown to the audience unless opened. */
   notes: string;
@@ -136,7 +138,8 @@ export type Visual =
     }
   | { kind: 'laneFollowing'; stages: Labelled[] }
   | { kind: 'obstacleAvoidance'; phases: Labelled[] }
-  | { kind: 'completePicture'; nodes: string[] };
+  | { kind: 'completePicture'; nodes: string[] }
+  | { kind: 'presentationEnd'; videoSrc: string };
 
 export type VisualKind = Visual['kind'];
 

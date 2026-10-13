@@ -479,4 +479,17 @@ export const slides: Slide[] = [
     },
     notes: 'Design lens: Autonomy emerges from interfaces, timing, failure handling and testing of the whole.\n\nFull words: script.md.',
   },
+  {
+    id: 'conclusion-video',
+    title: "THAT'S THE END OF OUR PRESENTATION",
+    subtitle: 'ANY QUESTIONS?',
+    theme: 'light',
+    layout: 'overlay',
+    hideHeading: true,
+    visual: {
+      kind: 'presentationEnd',
+      videoSrc: '/presentation_end.mp4',
+    },
+    notes: 'Outro & Q&A: Animated video concluding the presentation and opening the floor for audience questions.',
+  },
 ];
